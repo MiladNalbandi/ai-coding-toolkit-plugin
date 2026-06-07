@@ -320,29 +320,47 @@ do not continue to the next tool.**
 
 ### 7. Review & Smoke — *green ≠ mergeable*
 
-#### 7a. Ask the user which review mode
+#### 7a. Ask the user which review modes to run
 
-Before running review, ask:
+**Use `AskUserQuestion` (multiSelect: true)** so the user gets real checkboxes:
 
+```json
+{
+  "question": "How do you want to review this change?",
+  "header": "Review mode",
+  "multiSelect": true,
+  "options": [
+    { "label": "Human review", "description": "I'll show the diff and pause until you reply 'approved' or list changes. Catches what tests can't." },
+    { "label": "AI review (superpowers:requesting-code-review)", "description": "Adversarial reviewer tries to find logic bugs, security holes, performance issues. Applies fixes per your call." },
+    { "label": "Smoke test (generated script + auto-fix loop)", "description": "Generate scripts/smoke/<feature>.sh, run it, drop failures into the debug loop until green." },
+    { "label": "Verification checklist (superpowers:verification-before-completion)", "description": "Forces evidence before any 'done' claim — test output, lint pass, smoke output." }
+  ]
+}
 ```
-How do you want to review this change? (default: both)
 
-  [x] Human review        — I'll pause and wait for you to read the diff
-  [x] AI review (superpowers:requesting-code-review) — adversarial bot review
-  [x] Smoke test          — generated script + auto-fix loop on failures
-
-Reply with what to SKIP (e.g. "skip human") or "all".
-```
-
-Store as `<review-mode>`.
+Store the selected labels as `<review-mode>`. Run each selected check in order: Human → AI → Smoke → Verification. Skip any not selected.
 
 #### 7b. Human review (if selected)
 
-Pause and ask the user to review:
+First, show the diff inline (`git diff` for unstaged work, or `git diff main...HEAD` for branch work) — keep it focused on the changed files only.
 
-> "Implementation ready. Please review the diff for: spec match, contract match, AC coverage, validation/authorization/ownership explicit and tested, no sensitive data exposed, no out-of-spec behavior. Reply 'approved' or list changes."
+Then **use `AskUserQuestion` (single-select)** to get a real decision:
 
-Wait for response. If changes requested → apply them and re-ask. Only proceed when approved.
+```json
+{
+  "question": "Implementation diff above. Approve? Check: spec match · contract match · AC coverage · validation/authz explicit · no sensitive data exposed · no out-of-spec behavior",
+  "header": "Human review",
+  "multiSelect": false,
+  "options": [
+    { "label": "✅ Approve — proceed to AI / smoke / next step", "description": "Diff matches spec and intent. Continue." },
+    { "label": "✏️  Request changes", "description": "I'll ask which files/lines, apply the changes, then re-show the diff." },
+    { "label": "🤖 Run AI review first, then decide", "description": "Get an adversarial second opinion before approving. Loops back to this question after." },
+    { "label": "❌ Reject — return to Step 5 (Implement)", "description": "Diff doesn't match spec. Restart implementation with what's missing." }
+  ]
+}
+```
+
+If "Request changes": ask for the change list via free text, apply, re-show diff, loop back to 7b. Only proceed when the user picks **Approve**.
 
 #### 7c. AI review (if selected)
 
@@ -358,12 +376,23 @@ That skill spawns an adversarial reviewer that:
 - Tries to find performance issues (N+1, blocking calls)
 - Checks the diff against the spec and contract
 
-For each finding the AI reviewer produces, decide:
-- **Apply** — fix it, re-run failing tests
-- **Defer** — log it as a follow-up issue with rationale
-- **Reject** — explain why the reviewer is wrong (and update the spec if it caused confusion)
+For each finding the AI reviewer produces, **use `AskUserQuestion` (single-select)** to get a per-finding decision:
 
-Loop until the AI reviewer returns no new high-severity findings.
+```json
+{
+  "question": "AI reviewer finding: {{title}} — {{severity}}. Detail: {{one-line summary}}",
+  "header": "Finding {{N}}/{{total}}",
+  "multiSelect": false,
+  "options": [
+    { "label": "✅ Apply — fix now", "description": "Apply the suggested fix, re-run the relevant tests." },
+    { "label": "📋 Defer — track as follow-up issue", "description": "Log to TODO/issue tracker with rationale. Don't block this PR." },
+    { "label": "❌ Reject — reviewer is wrong", "description": "Document why in PR notes. If the spec caused the confusion, amend it." },
+    { "label": "🔍 Show full detail before deciding", "description": "Print the full reviewer rationale + diff suggestion, then re-ask." }
+  ]
+}
+```
+
+Loop until the AI reviewer returns no new high-severity findings. Track all decisions in a single summary at the end (e.g. "Applied 3, deferred 1, rejected 1").
 
 #### 7d. Smoke test (if selected)
 
@@ -421,19 +450,24 @@ After review, **generate a real smoke test script** rather than running ad-hoc c
 4. **Add a regression test** in the unit/feature suite for every smoke failure
    before marking complete. A bug that came back once will come back again.
 
-5. **Final review gate after fixes** — when all smoke checks pass, ask the user again:
+5. **Final review gate after fixes** — when all smoke checks pass, **use `AskUserQuestion` (multiSelect: true)**:
 
+   ```json
+   {
+     "question": "All smoke checks pass after fixes. Which final reviews should I run?",
+     "header": "Final review",
+     "multiSelect": true,
+     "options": [
+       { "label": "Human review of the fix diff", "description": "Show diff of files touched during smoke fixes. Catches regressions introduced while fixing." },
+       { "label": "AI review (superpowers:requesting-code-review) on the fix", "description": "Adversarial review focused on the fix diff. Each finding gets an Apply/Defer/Reject decision." },
+       { "label": "Verification checklist (superpowers:verification-before-completion)", "description": "MANDATORY before any 'done' claim — forces test output, lint pass, smoke output as evidence." },
+       { "label": "Re-run full test suite + smoke", "description": "Belt-and-braces final check before marking complete." }
+     ]
+   }
    ```
-   All smoke checks pass after fixes. Run final review? (default: yes)
 
-     [x] Human review of the fix diff
-     [x] AI review (superpowers:requesting-code-review) on the fix
-     [x] Run superpowers:verification-before-completion checklist
-   ```
-
-   The `superpowers:verification-before-completion` skill is mandatory before
-   claiming "done" — it forces evidence (test output, smoke output, lint pass)
-   before any success claim, commit, or PR.
+   `superpowers:verification-before-completion` is strongly recommended — it forces
+   evidence (test output, smoke output, lint pass) before any success claim, commit, or PR.
 
 If smoke fails for a reason that is actually a spec gap (the test is right, the spec
 is incomplete) — return to step 1 (Spec) and amend, do not patch around it.

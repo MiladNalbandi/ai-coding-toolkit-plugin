@@ -138,25 +138,59 @@ Store answer as `<identity-scope>`. Use it to:
 
 ### Question 3 — Do you want the ACs reviewed before proceeding?
 
-After producing numbered acceptance criteria (section 2), ask:
+After producing numbered acceptance criteria (section 2), **use `AskUserQuestion` (multiSelect: true)**:
 
+```json
+{
+  "question": "ACs drafted. Which review do you want before handoff?",
+  "header": "AC review",
+  "multiSelect": true,
+  "options": [
+    { "label": "Human review", "description": "Pause and wait for your approval. You'll see the full AC list and can pick approve / edit / reject." },
+    { "label": "AI review (superpowers:requesting-code-review)", "description": "Adversarial reviewer scans for vague/untestable ACs, overlap, missing edge cases, multi-requirement bullets." },
+    { "label": "Skip review", "description": "Proceed straight to handoff. Use when you've already reviewed the ACs yourself." }
+  ]
+}
 ```
-ACs are drafted. How do you want to review them? (default: human)
 
-  [x] Human review        — pause and wait for your approval
-  [x] AI review (superpowers:requesting-code-review) — adversarial check for vague,
-                            untestable, or overlapping ACs
-  [ ] Skip review         — proceed straight to handoff
+**For Human review**, after showing the ACs use `AskUserQuestion` (single-select) to get the decision:
+
+```json
+{
+  "question": "Acceptance criteria above. Approve?",
+  "header": "AC approval",
+  "multiSelect": false,
+  "options": [
+    { "label": "✅ Approve — proceed to handoff", "description": "ACs cover the intent. Continue to next-step recommendation." },
+    { "label": "✏️  Edit specific ACs", "description": "I'll ask which AC numbers, apply changes, then re-ask." },
+    { "label": "🤖 Run AI review first", "description": "Get adversarial second opinion before deciding." },
+    { "label": "❌ Reject — re-run requirement questions", "description": "ACs don't match intent. Go back to Section 1 with new context." }
+  ]
+}
 ```
 
-For AI review, the reviewer should look for:
+**For AI review**, scan for:
 - ACs that aren't testable ("works well", "user-friendly")
 - ACs that overlap or contradict each other
 - Missing edge cases (empty input, auth failures, rate limits)
 - ACs that hide multiple requirements in one bullet
 
-Apply / defer / reject each finding. Loop until clean before handing off to
-`coding-workflows` or `spec-driven-development`.
+For each finding, **use `AskUserQuestion` (single-select)** per finding:
+
+```json
+{
+  "question": "AI finding on AC-{{NNN}}: {{summary}}",
+  "header": "Finding {{N}}/{{total}}",
+  "multiSelect": false,
+  "options": [
+    { "label": "✅ Apply — rewrite this AC", "description": "Apply the suggested rewrite to make the AC testable / split / cover the edge case." },
+    { "label": "📋 Defer — add to follow-up", "description": "Track as a follow-up AC for the next iteration." },
+    { "label": "❌ Reject — reviewer is wrong", "description": "Keep the AC as-is. The reviewer misread the intent." }
+  ]
+}
+```
+
+Loop until the AI reviewer returns no new findings, then hand off to `coding-workflows` or `spec-driven-development`.
 
 ---
 
