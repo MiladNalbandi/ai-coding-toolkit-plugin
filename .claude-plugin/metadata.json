@@ -4,6 +4,7 @@
   "description": "Structured workflows, clarify-first loops, prompt library, and MCP setup for fast AI-assisted feature development and debugging.",
   "author": "Milad Nalbandi Rezaei",
   "skills": [
+    "project-onboarding",
     "spec-driven-development",
     "coding-workflows",
     "clarify-loop",
@@ -11,6 +12,7 @@
     "mcp-toolkit"
   ],
   "triggers": {
+    "project-onboarding": ["onboard this project", "init project", "start a new project", "analyze this codebase", "what does this project do"],
     "spec-driven-development": ["spec", "write a spec", "acceptance criteria", "ADR", "contract first", "feature the right way", "set up SDD"],
     "coding-workflows": ["build", "implement", "develop", "create feature", "add feature"],
     "clarify-loop": ["start", "begin", "plan", "before coding", "what should I"],
