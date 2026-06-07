@@ -29,8 +29,9 @@ Create these tasks via `TaskCreate`:
 | 1 | Init Ruflo session and swarm | Initializing Ruflo |
 | 2 | Run 4 parallel analysis agents | Analyzing codebase |
 | 3 | Write docs/PROJECT.md | Writing onboarding doc |
-| 4 | Store findings in Ruflo memory | Persisting to memory |
-| 5 | Scaffold SDD structure if missing | Scaffolding SDD |
+| 4 | Write CLAUDE.md | Writing CLAUDE.md |
+| 5 | Store findings in Ruflo memory | Persisting to memory |
+| 6 | Scaffold SDD structure if missing | Scaffolding SDD |
 
 ---
 
@@ -196,6 +197,50 @@ Mark task 3 completed.
 
 ---
 
+### Step 3b — Write CLAUDE.md
+
+If a `CLAUDE.md` already exists, add missing sections only — do not overwrite existing content.
+If it does not exist, create it now using Agent A and Agent C data.
+
+Use this exact structure:
+
+```markdown
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Commands
+
+| Task | Command |
+|------|---------|
+| Build | {from Agent C} |
+| Run all tests | {from Agent C} |
+| Run single test | {from Agent C} |
+| Lint | {from Agent C} |
+| Format | {from Agent C} |
+| Start dev server | {from Agent C} |
+
+## Architecture
+
+**Style:** {architectural style from Agent A}
+
+**Layers:**
+{bullet list: layer name → what it does, from Agent A}
+
+**Entry points:** {from Agent A — HTTP routes, CLI, consumers, cron}
+
+**Key patterns:** {from Agent A — DI, repo pattern, domain events, CQRS, etc.}
+
+**Domain logic lives in:** {specific folder/layer from Agent A}
+```
+
+Rules:
+- Every command must be a real command string — no placeholders like `<command>`
+- If a tool was "not detected" by Agent C, omit that row from the table entirely
+- Keep it under 60 lines — CLAUDE.md is a quick-reference, not a full doc
+
+---
+
 ### Step 4 — Store findings in Ruflo memory
 
 Call `mcp__ruflo__memory_store` for each entry below in a **single message** (all parallel). Use `upsert: true` so re-running onboarding updates existing entries rather than failing.
@@ -266,7 +311,7 @@ Mark task 4 completed.
 
 Print a one-line summary:
 ```
-Onboarding complete. docs/PROJECT.md written. 3 Ruflo memory entries stored. {N} SDD files scaffolded.
+Onboarding complete. CLAUDE.md written. docs/PROJECT.md written. 3 Ruflo memory entries stored. {N} SDD files scaffolded.
 ```
 
 ---
