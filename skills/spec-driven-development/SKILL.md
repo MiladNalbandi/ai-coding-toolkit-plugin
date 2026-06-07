@@ -38,6 +38,7 @@ This skill is most powerful when chained with sibling skills.
     { "label": "Clarify only", "description": "Just produce numbered ACs (clarify-loop). Use when you'll implement later or hand off." },
     { "label": "Brainstorm → design", "description": "superpowers:brainstorming → writing-plans. Use when the idea is fuzzy and needs shape first." },
     { "label": "Quick build (simple code flow)", "description": "coding-workflows lightweight flow — no spec/contract. Use for trivial changes with no contract or data impact." },
+    { "label": "Plan → Build → Verify (PBV)", "description": "coding-workflows Workflow 5: plan + human approval → small tasks → multi-agent build → tests → smoke/e2e → lint → human review. Use when the change deserves a plan but not a frozen spec." },
     { "label": "Full SDD (Recommended)", "description": "spec → contract → red tests → implement → smoke. Use when data, auth, or API contract is touched." },
     { "label": "Full SDD + TDD", "description": "SDD + superpowers:test-driven-development. Use for high-risk or regulatory work — strictest mode." },
     { "label": "Debug existing bug", "description": "superpowers:systematic-debugging. Use when this is a bug, not a feature." },
@@ -55,6 +56,7 @@ Store the selected label as `<flow>`. If the user picks anything other than **Fu
 | **Clarify only** | `ai-coding-toolkit:clarify-loop` | — | stop after ACs |
 | **Brainstorm → design** | `superpowers:brainstorming` | `superpowers:writing-plans` | hand to user |
 | **Quick build (simple code flow)** | `ai-coding-toolkit:clarify-loop` (sections 1, 2 only) | `ai-coding-toolkit:coding-workflows` (Workflow 1) | `superpowers:verification-before-completion` |
+| **Plan → Build → Verify (PBV)** | `ai-coding-toolkit:clarify-loop` (sections 1, 2) | `ai-coding-toolkit:coding-workflows` (Workflow 5) + `ai-coding-toolkit:multi-agent` | `superpowers:verification-before-completion` + `superpowers:requesting-code-review` |
 | **Full SDD** | `ai-coding-toolkit:clarify-loop` (all sections) | this SDD skill (Step 0 → 8) | `superpowers:requesting-code-review` |
 | **Full SDD + TDD** | `ai-coding-toolkit:clarify-loop` | `superpowers:test-driven-development` for tests + this SDD skill for everything else | `superpowers:requesting-code-review` + `superpowers:verification-before-completion` |
 | **Debug existing bug** | `superpowers:systematic-debugging` | `ai-coding-toolkit:coding-workflows` (Workflow 2) for regression test | `superpowers:verification-before-completion` |
