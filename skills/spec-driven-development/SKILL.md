@@ -168,11 +168,52 @@ do not continue to the next tool.**
 ### 7. Review & Smoke — *green ≠ mergeable*
 Human review confirms the implementation matches the spec, the contract matches real
 behavior, ACs are covered, validation/authorization/ownership are explicit and tested,
-sensitive data is not exposed, and no out-of-spec behavior crept in. Then a small, fast,
-**boring** smoke test proves the app boots, routes are registered, the database is
-reachable, auth works, the changed path works once happy and once failing, and the
-response shape matches the contract. If smoke fails, return to the earliest broken step —
-do not patch around it.
+sensitive data is not exposed, and no out-of-spec behavior crept in.
+
+#### Generate and run a smoke test script
+
+After review, **generate a real smoke test script** rather than running ad-hoc commands.
+
+1. **Write the script** to `scripts/smoke/<feature-slug>.sh` (or the project's
+   equivalent — `.ps1`, `.py`, `.mjs`). It must cover:
+   - App boots and listens on the expected port
+   - Routes for the feature are registered (list / curl `--head`)
+   - Database / queue / cache is reachable
+   - Auth works (login / token exchange)
+   - The happy path of the changed endpoint returns 2xx with the contract shape
+   - At least one failure path returns the correct 4xx with the contract error shape
+   - Sensitive fields are NOT in the response
+
+2. **Run the script** and capture output. Present results as a checklist:
+
+   ```
+   Smoke test: docs/specs/001-post-bookmarks.md
+     ✔ app boots (8000)            200ms
+     ✔ POST /api/bookmarks routed
+     ✔ db reachable
+     ✔ login → token
+     ✔ happy: POST /api/bookmarks → 201 (shape matches contract)
+     ✘ fail: POST /api/bookmarks (no title) → got 500, expected 422
+     ✔ no `password_hash` in response
+
+   1 failure. Dropping into debug loop.
+   ```
+
+3. **If any check fails → enter the debug & fix loop** from the `coding-workflows`
+   skill (Workflow 2: Debugging — Reproduce → Read error → Isolate layer →
+   Hypothesize → Fix, verify, prevent). For each failure:
+   - State the symptom in one line
+   - Read the relevant log lines / stack trace
+   - Ask: which layer owns this — handler, validator, action, repository, db?
+   - Apply the minimum fix
+   - Re-run **only the failing smoke check first**, then the full script
+   - Loop until all checks pass
+
+4. **Add a regression test** in the unit/feature suite for every smoke failure
+   before marking complete. A bug that came back once will come back again.
+
+If smoke fails for a reason that is actually a spec gap (the test is right, the spec
+is incomplete) — return to step 1 (Spec) and amend, do not patch around it.
 
 ### 8. ADR — *record non-obvious decisions* (when warranted)
 Write `docs/adr/NNNN-title.md` from `assets/adr-template.md` for decisions like: choosing
