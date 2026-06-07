@@ -43,26 +43,171 @@ Store as `<task-type>`. Skip the question blocks for the other 5 types.
 
 ### Question 2 — Which sections do you want?
 
+Present each section as its own interactive step. Ask one at a time. Wait for a reply before moving to the next.
+
+---
+
+**Section 1 of 6 — Requirement questions**
+
 ```
-For task type <task-type>, which sections do you want? (default: all ✅)
+📋 SECTION 1 — Requirement questions
 
-  ✅ 1. Requirement questions     — clarifying checklist for your task type
-  ✅ 2. Acceptance criteria       — numbered, testable ACs (AC-001, AC-002 …)
-  ✅ 3. Definition of Done        — exit checklist: what "done" means here
-  ✅ 4. Red-flag check            — scan for hidden scope, unclear ownership, untestable ACs
-  ✅ 5. Ready-to-send prompt      — filled-in prompt to paste into a new session
-  ✅ 6. Next-step recommendation  — which skill to use next and why
+This walks you through a task-specific checklist of clarifying questions before
+any code is written. Each question uncovers a potential assumption or gap:
+scope boundaries, affected files, constraints, edge cases, and success criteria.
 
-Reply with section numbers to skip (e.g. "skip 4, 6") or press enter for all.
+Skipping this is safe only if you already have written, unambiguous requirements.
+
+  ✅ Include  (I'll ask the questions one at a time)
+  ⬜ Skip     (you already have clear requirements)
+
+Your choice:
 ```
 
-Store as `<active-sections>`. Skip any section not in this set.
+Wait for reply. Store as `section_1`.
 
-**Common skip combinations:**
-- Trivial bug fix → skip 3, 6
-- Already have requirements → skip 1, 3
-- Already have a spec → skip 1, 2, 5
-- Just exploring → skip 3, 4, 5
+---
+
+**Section 2 of 6 — Acceptance criteria**
+
+```
+📐 SECTION 2 — Acceptance criteria (AC-001, AC-002 …)
+
+From your answers, I'll produce numbered, testable success conditions — one per
+observable behavior. Each AC is:
+  • Specific: "returns 422 when title is empty", not "validates input"
+  • Testable: maps to exactly one or more test cases
+  • Bounded: no vague language like "works correctly" or "handles errors"
+
+These ACs become the source of truth for tests and spec files later.
+
+Skipping is safe if you already have ACs from a spec or previous session.
+
+  ✅ Include  (produce numbered ACs from my answers)
+  ⬜ Skip     (I already have ACs)
+
+Your choice:
+```
+
+Wait for reply. Store as `section_2`.
+
+---
+
+**Section 3 of 6 — Definition of Done**
+
+```
+☑️  SECTION 3 — Definition of Done
+
+A short, task-specific exit checklist that makes "done" unambiguous. Examples:
+  • All ACs have a passing test
+  • No existing tests broken
+  • Lint passes
+  • PR reviewed and approved
+  • Deployed to staging
+
+Without this, "done" means different things to you, the AI, and your reviewer.
+
+Skipping is fine for trivial 1-line fixes with no review process.
+
+  ✅ Include  (generate a DoD checklist for this task type)
+  ⬜ Skip     (not needed for this task)
+
+Your choice:
+```
+
+Wait for reply. Store as `section_3`.
+
+---
+
+**Section 4 of 6 — Red-flag check**
+
+```
+🚩 SECTION 4 — Red-flag check
+
+After seeing your answers, I'll scan for stop-the-line signals that indicate
+the task is not ready to implement yet. Common red flags:
+  • Hidden scope ("just also add X while you're there")
+  • Unclear ownership ("someone needs to handle auth for this")
+  • Untestable ACs ("it should feel fast")
+  • Missing authorization decision ("any user can do this?")
+  • BC break risk ("this changes an existing API contract")
+
+Each red flag gets a clear explanation and a suggested resolution before you proceed.
+
+  ✅ Include  (scan my answers for red flags)
+  ⬜ Skip     (I'm confident the scope is clean)
+
+Your choice:
+```
+
+Wait for reply. Store as `section_4`.
+
+---
+
+**Section 5 of 6 — Ready-to-send prompt**
+
+```
+📨 SECTION 5 — Ready-to-send prompt (assembler)
+
+I'll produce a single, complete, filled-in prompt you can paste directly into
+a new Claude Code session to start implementation. It includes:
+  • Task description with all constraints
+  • Numbered ACs as explicit requirements
+  • Files to create or modify
+  • Patterns to follow (existing code references)
+  • Approval gate: "wait for my go-ahead before implementing"
+
+This bridges clarification → implementation without losing any context.
+
+Skipping is fine if you're handing off to a spec file or implementation plan instead.
+
+  ✅ Include  (generate the ready-to-send prompt)
+  ⬜ Skip     (I'll write my own prompt or use a spec)
+
+Your choice:
+```
+
+Wait for reply. Store as `section_5`.
+
+---
+
+**Section 6 of 6 — Next-step recommendation**
+
+```
+🗺️  SECTION 6 — Next-step recommendation
+
+Based on your task type and the ACs we produced, I'll recommend which skill
+to use next — and explain why:
+
+  • coding-workflows  → for simple, clear tasks with no contract impact
+  • spec-driven-development (full SDD) → for anything touching data, auth, or a public API
+  • superpowers:brainstorming → if the design is still fuzzy after clarifying
+  • superpowers:systematic-debugging → if this turned out to be a bug investigation
+
+I'll also tell you what to bring into the next session (ACs, relevant files, stack info).
+
+  ✅ Include  (recommend my next step)
+  ⬜ Skip     (I already know what to do next)
+
+Your choice:
+```
+
+Wait for reply. Store as `section_6`.
+
+---
+
+After collecting all 6 answers, confirm before running:
+
+```
+Got it. Here's what we'll run:
+
+  <list only the included sections with ✅>
+  <list only the skipped sections with ⬜ Skipped>
+
+Starting now — reply "go" to begin or change any section.
+```
+
+Store selected sections as `<active-sections>`. Run only those in order.
 
 ### Question 2.5 — Identity vs. authentication probe (auto-trigger)
 
