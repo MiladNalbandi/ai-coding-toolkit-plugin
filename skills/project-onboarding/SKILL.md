@@ -12,6 +12,45 @@
 
 ---
 
+## Step 0 — Initialize Claude itself (do this before pasting the prompt)
+
+Run these commands manually in a new Claude Code session before anything else:
+
+```bash
+# 1. Navigate to the project
+cd /path/to/your/project
+
+# 2. Set the model (Sonnet for most work, Opus for complex architecture)
+/model
+
+# 3. Set effort level
+/effort
+
+# 4. Verify plugins are loaded
+/plugins
+
+# 5. Check context is clean
+/context
+
+# 6. Verify RTK is active
+rtk gain
+
+# 7. Verify Ruflo MCP tools are available
+/mcp
+```
+
+**Checklist before running onboarding:**
+
+- [ ] Model set (Sonnet 4.6 default, Opus for deep architecture work)
+- [ ] Effort level set (`high` for onboarding — you want thorough analysis)
+- [ ] Working directory is the project root
+- [ ] `ai-coding-toolkit` plugin is enabled (`/plugins`)
+- [ ] RTK active (`rtk gain` shows version)
+- [ ] MCP tools visible (`/mcp` shows connected servers)
+- [ ] Context is fresh (new session, not a resumed one with stale context)
+
+---
+
 ## Onboarding Prompt
 
 Paste this at the start of a new project session:
