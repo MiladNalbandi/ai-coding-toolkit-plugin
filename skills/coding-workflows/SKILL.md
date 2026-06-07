@@ -545,6 +545,28 @@ Run tasks in dependency order. After each task: run only the relevant tests, the
 
 ---
 
+### Step 3.5 — Human review gate after implementation
+
+Show the user the implementation diff (all files written by the agents). Then **use `AskUserQuestion` (single-select)**:
+
+```json
+{
+  "question": "Implementation complete. Review the code before I write tests?",
+  "header": "Post-impl review",
+  "multiSelect": false,
+  "options": [
+    { "label": "✅ Approve — proceed to write tests", "description": "Implementation matches the plan. Move on." },
+    { "label": "✏️  Request changes", "description": "I'll ask which files/lines, apply changes, then re-show the diff." },
+    { "label": "🤖 AI review first (superpowers:requesting-code-review)", "description": "Adversarial review before tests are written. Each finding gets Apply / Defer / Reject." },
+    { "label": "❌ Reject — restart from Step 3 (rebuild)", "description": "Implementation diverges from the plan. Spawn agents again with corrected prompts." }
+  ]
+}
+```
+
+Do not proceed to Step 4 until **Approve**.
+
+---
+
 ### Step 4 — Write tests for what was built
 
 Per Step 3 of SDD (test pyramid, AAA, isolation, factories, mocking). Cover:
@@ -553,6 +575,28 @@ Per Step 3 of SDD (test pyramid, AAA, isolation, factories, mocking). Cover:
 - **Contract** — if the change touches an API or interface
 
 Tests must be **green** before moving to smoke. No skipped tests committed without a tracked follow-up.
+
+---
+
+### Step 4.5 — Human review gate after tests
+
+Show the user the test diff (new test files + any test modifications) and the test run output. Then **use `AskUserQuestion` (single-select)**:
+
+```json
+{
+  "question": "Tests written and passing. Review them before smoke/e2e?",
+  "header": "Post-test review",
+  "multiSelect": false,
+  "options": [
+    { "label": "✅ Approve — proceed to smoke and e2e", "description": "Tests cover the ACs at the right layer with good isolation." },
+    { "label": "✏️  Request changes — missing cases or weak assertions", "description": "I'll ask which tests/cases, add or strengthen them, then re-run." },
+    { "label": "🤖 AI review the tests (superpowers:requesting-code-review)", "description": "Adversarial review catches vague assertions, missing edge cases, mocking smell." },
+    { "label": "❌ Reject — tests don't match the plan/ACs", "description": "Restart Step 4 with corrected scope." }
+  ]
+}
+```
+
+Do not proceed to Step 5 until **Approve**.
 
 ---
 
