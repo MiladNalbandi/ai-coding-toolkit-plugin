@@ -34,10 +34,14 @@ Constraints:
 ---
 Before writing any code:
 1. Ask me if anything is unclear
-2. List every file you will touch and the key design decisions
-3. Wait for my approval
-Then implement one step at a time.
+2. Turn the requirements into NUMBERED acceptance criteria (AC-001, AC-002, …)
+   — each observable, testable, and small enough to map to one test.
+3. List every file you will touch and the key design decisions
+4. Wait for my approval
+Then implement one step at a time, naming tests after the AC they cover.
 ```
+
+> **Upgrade path:** the moment you write numbered ACs, you're doing spec-driven development. For anything non-trivial, save these ACs into `docs/specs/NNN-feature.md` and run the `spec-driven-development` loop — it carries the ACs all the way through contract, tests, and the Definition of Done.
 
 ---
 
@@ -227,3 +231,21 @@ Before ANY coding task, ask yourself these five questions. If you can't answer t
 - The requirements contain the word "later", "eventually", or "maybe"
 - You're about to change a public interface or database schema
 - The task feels bigger than 1 day of work without a plan
+
+---
+
+## Definition of Done (adopted from spec-driven-development)
+
+A change is mergeable only when **all** of these hold. Use this as the exit checklist for any feature:
+
+- [ ] The requirements are captured as **numbered acceptance criteria** (AC-001, AC-002, …), each observable and testable.
+- [ ] Tests exist, map back to ACs by name, and **failed before** implementation (red-first).
+- [ ] Input validation is explicit and tested (required/optional, types, format, length, range, allowed values, cross-field, uniqueness).
+- [ ] Authentication, authorization, and **ownership** rules are explicit and tested.
+- [ ] Sensitive/internal fields are not exposed; error responses are intentional.
+- [ ] For HTTP features: the API contract (OpenAPI/proto/GraphQL) was updated **before** the code and matches real behavior.
+- [ ] Formatter, static analysis, full test suite, and a small smoke test all pass.
+- [ ] No behavior outside the agreed ACs was added (**YAGNI**).
+- [ ] Any non-obvious decision has an ADR.
+
+> The full discipline behind this checklist lives in the `spec-driven-development` skill. This clarify loop is where you *start* that discipline — by turning a vague request into numbered ACs before any code exists.

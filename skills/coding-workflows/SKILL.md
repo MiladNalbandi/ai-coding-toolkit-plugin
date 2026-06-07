@@ -6,6 +6,10 @@
 
 ## Workflow 1: Feature Development
 
+> **For rigorous, traceable feature work, use the `spec-driven-development` skill instead of this lightweight flow.** SDD enforces a spec → contract → red-tests → implement → Definition-of-Done loop with numbered acceptance criteria. The steps below are the fast path for small changes; SDD is the disciplined path for anything that touches data, auth, or a public contract.
+>
+> Quick rule: if the change has acceptance criteria worth numbering, or touches validation / authorization / an API contract → switch to `spec-driven-development`. Otherwise the steps below are enough.
+
 ### Step 1 — Clarify requirements first
 
 **Never write code before confirming scope.** Run the clarify loop (see `02-clarify-loop.md`) for your task type.

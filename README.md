@@ -24,10 +24,24 @@ claude-code plugin install https://github.com/{{your-username}}/ai-coding-toolki
 
 | Skill | Trigger | What it does |
 |-------|---------|--------------|
-| `coding-workflows` | Starting a feature, debug session, or review | Step-by-step workflow with prompts for each stage |
-| `clarify-loop` | Before any coding task | Surfaces the right questions to answer before writing code |
+| `spec-driven-development` | Building a feature "the right way", writing a spec or ADR | The rigorous backbone: spec → contract → red tests → implement → Definition of Done, with numbered ACs and stack mapping across PHP/Python/Go/Node/Rust |
+| `coding-workflows` | Starting a feature, debug session, or review | Step-by-step workflow with prompts; hands off to `spec-driven-development` for non-trivial features |
+| `clarify-loop` | Before any coding task | Surfaces the right questions, produces **numbered acceptance criteria**, and carries a Definition of Done checklist |
 | `prompt-library` | Need a ready-made prompt | 12+ prompt templates across implement, debug, review, test, arch, ops |
 | `mcp-toolkit` | Setting up or using MCP tools | How to wire up and use filesystem, browser, GitHub, and database MCPs |
+
+### How the feature path flows across skills
+
+```
+clarify-loop          spec-driven-development              mcp-toolkit
+(turn request    →    (spec → contract → red tests    +    (filesystem reads code,
+ into numbered         → implement → refactor →             db runs EXPLAIN, browser
+ acceptance            review → Definition of Done           reads live API docs while
+ criteria)             → ADR)                                you implement)
+
+coding-workflows owns the Debug, Architecture, and Review flows that SDD does not cover.
+prompt-library supplies the copy-paste prompts for every step above.
+```
 
 ---
 
@@ -85,14 +99,18 @@ ai-coding-toolkit/
 ├── .claude-plugin/
 │   └── metadata.json
 ├── skills/
+│   ├── spec-driven-development/  # The rigorous feature-building backbone
+│   │   ├── SKILL.md              #   spec → contract → red tests → DoD loop
+│   │   ├── assets/               #   spec, ADR, conventions, glossary, openapi templates
+│   │   └── references/           #   workflow, stack-mapping, database, frontend
 │   ├── coding-workflows/
-│   │   └── SKILL.md          # Feature, Debug, Architecture, Review flows
+│   │   └── SKILL.md              # Feature, Debug, Architecture, Review flows
 │   ├── clarify-loop/
-│   │   └── SKILL.md          # 6 task types with assembled prompt templates
+│   │   └── SKILL.md              # 6 task types → numbered ACs + Definition of Done
 │   ├── prompt-library/
-│   │   └── SKILL.md          # 12+ ready-to-use prompt templates
+│   │   └── SKILL.md              # 12+ ready-to-use prompt templates
 │   └── mcp-toolkit/
-│       └── SKILL.md          # Filesystem, Browser, GitHub, Database setup
+│       └── SKILL.md              # Filesystem, Browser, GitHub, Database setup
 └── README.md
 ```
 
