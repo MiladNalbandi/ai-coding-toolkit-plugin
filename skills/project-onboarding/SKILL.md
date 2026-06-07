@@ -26,20 +26,25 @@ Create these tasks via `TaskCreate`:
 
 | # | Subject | activeForm |
 |---|---------|------------|
-| 1 | Auto-init Ruflo swarm | Initializing swarm |
+| 1 | Init Ruflo session and swarm | Initializing Ruflo |
 | 2 | Run 4 parallel analysis agents | Analyzing codebase |
 | 3 | Write docs/PROJECT.md | Writing onboarding doc |
-| 4 | Scaffold SDD structure if missing | Scaffolding SDD |
+| 4 | Store findings in Ruflo memory | Persisting to memory |
+| 5 | Scaffold SDD structure if missing | Scaffolding SDD |
 
 ---
 
-### Step 2 — Auto-init Ruflo swarm (fire and proceed, don't block)
+### Step 2 — Init Ruflo (fire and proceed, don't block)
 
-Call these MCP tools. If they fail or timeout, fall back to Claude's native Agent tool — do not stop:
+Call ALL three MCP tools in a **single message** (parallel). If any fail, proceed anyway — never block:
 
 ```
+mcp__ruflo__hooks_session-start({ sessionId: "<project-name>-onboarding" })
+mcp__ruflo__hooks_init({})
 mcp__ruflo__swarm_init({ topology: "mesh", maxAgents: 4 })
 ```
+
+Derive `<project-name>` from the repo root folder name or `package.json`/`composer.json`/`Cargo.toml` name field.
 
 Mark task 1 completed. Proceed immediately to step 3 regardless of result.
 
@@ -191,6 +196,57 @@ Mark task 3 completed.
 
 ---
 
+### Step 4 — Store findings in Ruflo memory
+
+Call `mcp__ruflo__memory_store` for each entry below in a **single message** (all parallel). Use `upsert: true` so re-running onboarding updates existing entries rather than failing.
+
+```
+mcp__ruflo__memory_store({
+  key: "<project-name>:domain",
+  namespace: "project",
+  upsert: true,
+  value: {
+    summary: "<1-2 sentence plain-language description from Agent B>",
+    users: "<who uses it>",
+    coreConcepts: ["<concept1>", "<concept2>", "..."],
+    keyFlows: ["<flow1>", "<flow2>", "..."],
+    externalDeps: ["<dep1>", "<dep2>", "..."]
+  }
+})
+
+mcp__ruflo__memory_store({
+  key: "<project-name>:architecture",
+  namespace: "project",
+  upsert: true,
+  value: {
+    style: "<architectural style from Agent A>",
+    layers: { "<layer>": "<what it does>", "...": "..." },
+    entryPoints: ["<entry1>", "..."],
+    patterns: ["<pattern1>", "..."],
+    techDebt: ["<debt1>", "<debt2>", "<debt3>"]
+  }
+})
+
+mcp__ruflo__memory_store({
+  key: "<project-name>:toolchain",
+  namespace: "project",
+  upsert: true,
+  value: {
+    build: "<command>",
+    test: "<command>",
+    singleTest: "<command>",
+    lint: "<command>",
+    format: "<command>",
+    devServer: "<command>",
+    ci: "<CI system and key stages>"
+  }
+})
+```
+
+Mark task 4 completed.
+
+---
+
 ### Step 5 — Scaffold SDD structure if missing
 
 Read Agent D's report. If any of these are missing, create them:
@@ -210,7 +266,7 @@ Mark task 4 completed.
 
 Print a one-line summary:
 ```
-Onboarding complete. docs/PROJECT.md written. {N} SDD files scaffolded.
+Onboarding complete. docs/PROJECT.md written. 3 Ruflo memory entries stored. {N} SDD files scaffolded.
 ```
 
 ---
@@ -221,7 +277,8 @@ Onboarding complete. docs/PROJECT.md written. {N} SDD files scaffolded.
 - Do NOT run steps sequentially when they can be parallelized
 - Do NOT generate multiple diagram files — exactly one Mermaid diagram, inline in PROJECT.md
 - Do NOT leave template placeholders in any output file
-- Do NOT block on Ruflo swarm init — if it fails, proceed with Claude native agents
+- Do NOT block on Ruflo init or swarm init — if they fail, proceed with Claude native agents
+- Do NOT skip `memory_store` — every onboarding run must persist domain, architecture, and toolchain to Ruflo
 - Do NOT summarize what you just did at the end beyond the one-line completion message
 
 ---
