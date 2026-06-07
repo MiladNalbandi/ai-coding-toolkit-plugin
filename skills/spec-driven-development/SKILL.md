@@ -187,12 +187,81 @@ its correct layer (see placement table in `references/workflow.md`) — never re
 entry-point handler to "remember" rules.
 
 ### 5. Implement — *minimum code to make tests green*
+
+#### 5a. Ask: sequential or parallel?
+
+```
+How do you want to implement this? (default: 2)
+
+  1. Sequential  — one layer at a time in this context (safe, simple)
+  2. Parallel    — fan out layers to parallel agents (faster, needs layer isolation)
+
+For parallel: each agent owns exactly one file/layer so there are no conflicts.
+Ruflo swarm is used if available; falls back to Claude native Agent tool.
+```
+
+Store as `<impl-mode>`.
+
+#### 5b-seq. Sequential implementation (if mode = 1)
+
 Default order: schema/migration → entity/model → test factory/fixture → authorization
 rule → use-case/action → input validator → output serializer → handler/endpoint → route.
 Stop when green. **YAGNI is load-bearing**: add no field, endpoint, abstraction, helper,
-permission, or behavior the spec did not ask for. Keep entry points thin; push
-validation, authorization, business rules, data access, and output shaping into their
-dedicated layers.
+permission, or behavior the spec did not ask for. Keep entry points thin.
+
+#### 5b-par. Parallel agent implementation (if mode = 2)
+
+**Pre-flight: assign one file per agent — no two agents share a file.**
+
+Map the spec's layers to agents. Typical split for an HTTP feature:
+
+| Agent | Layer | Owns |
+|-------|-------|------|
+| A | Schema / Migration | `database/migrations/NNN_*.sql` or ORM migration file |
+| B | Model / Entity | `src/models/FeatureName.js` (or equivalent) |
+| C | Validator / Input | `src/validators/featureName.js` |
+| D | Use-case / Action | `src/actions/FeatureName.js` |
+| E | Serializer / DTO | `src/serializers/featureName.js` |
+| F | Handler + Route | `src/handlers/featureName.js` + route registration |
+
+Adjust to the project's actual layer names (see `references/stack-mapping.md`).
+
+**If Ruflo is available:**
+```
+ruflo swarm_init --topology star --max-agents 6
+ruflo agent_spawn --role schema      --task "Implement migration for <feature> per docs/specs/NNN.md"
+ruflo agent_spawn --role model       --task "Implement model/entity for <feature>"
+ruflo agent_spawn --role validator   --task "Implement input validator for <feature>"
+ruflo agent_spawn --role action      --task "Implement use-case/action for <feature>"
+ruflo agent_spawn --role serializer  --task "Implement output serializer for <feature>"
+ruflo agent_spawn --role handler     --task "Implement handler + route for <feature>"
+```
+
+**If Ruflo is unavailable — Claude native Agent tool (send all in ONE message):**
+
+Spawn all agents in a single message with parallel `Agent` tool calls. Each agent prompt must include:
+- The spec file path and the specific AC numbers it is responsible for
+- The exact file it must write (one file only)
+- The layer contract: what it receives as input, what it must return
+- The YAGNI constraint: implement only what the spec requires
+- Instruction to return the full file content as its response
+
+**Conflict detection before spawning:**
+List all files each agent will write. If any file appears twice → serialize those two agents (run the second after the first completes). Never let two agents write the same file.
+
+**After all agents complete:**
+
+1. **Merge** — collect all agent outputs into the working tree
+2. **Wire** — ensure layers import each other correctly (handler imports action, action imports validator, etc.)
+3. **Run tests** — `<test-command>` from Step 0. Show result:
+   ```
+   Post-merge test run:
+     ✔ 6/6 tests pass
+     — or —
+     ✘ 2 failures (agent C validator missing required field check — fix inline)
+   ```
+4. **Fix inline** if any test fails — do not re-spawn agents for small fixes; fix in this context and re-run
+5. Proceed to Step 6 (Refactor) only when all tests are green
 
 ### 6. Refactor — *clean up while green*
 Run **only the tools the user selected in `<active-tools>` (Step 0, Question 2)** —

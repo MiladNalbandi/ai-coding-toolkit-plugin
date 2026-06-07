@@ -84,6 +84,17 @@ Wait for my approval before writing any implementation code.
 
 ### Step 4 — Implement incrementally
 
+First, ask the user:
+
+```
+How do you want to implement this? (default: 2)
+
+  1. Sequential  — one layer at a time in this context (safe, simple)
+  2. Parallel    — fan out independent layers to parallel agents (faster)
+```
+
+#### Sequential (mode 1)
+
 One logical chunk at a time. Each chunk must be runnable.
 
 ```
@@ -98,6 +109,31 @@ Rules:
 
 After each step, summarize what you did and what comes next.
 ```
+
+#### Parallel (mode 2)
+
+Map the approved plan's steps to agents — **one file per agent, no overlap**.
+
+**Conflict check first:** list all files each agent will write. If any file appears
+twice, serialize those two agents. Never let two agents share a file.
+
+**If Ruflo is available:**
+```
+ruflo swarm_init --topology star --max-agents <N>
+ruflo agent_spawn --role <layer> --task "Implement <step> per the approved plan. Write only <file>. Follow existing patterns in this codebase."
+# repeat per layer
+```
+
+**If Ruflo unavailable — Claude native Agent tool:**
+Send all `Agent` tool calls in a **single message** so they run concurrently.
+Each agent prompt must include: the approved plan excerpt, the exact file to write,
+the layer contract (inputs/outputs), and the YAGNI constraint.
+
+**After all agents complete:**
+1. Merge all outputs into the working tree
+2. Wire imports between layers
+3. Run tests — show pass/fail per test
+4. Fix inline if any fail (don't re-spawn for small fixes)
 
 ---
 
