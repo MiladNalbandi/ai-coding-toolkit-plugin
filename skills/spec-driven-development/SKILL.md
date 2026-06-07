@@ -166,6 +166,54 @@ first. Refactor only while the suite stays green. **If a tool fails, stop and re
 do not continue to the next tool.**
 
 ### 7. Review & Smoke — *green ≠ mergeable*
+
+#### 7a. Ask the user which review mode
+
+Before running review, ask:
+
+```
+How do you want to review this change? (default: both)
+
+  [x] Human review        — I'll pause and wait for you to read the diff
+  [x] AI review (superpowers:requesting-code-review) — adversarial bot review
+  [x] Smoke test          — generated script + auto-fix loop on failures
+
+Reply with what to SKIP (e.g. "skip human") or "all".
+```
+
+Store as `<review-mode>`.
+
+#### 7b. Human review (if selected)
+
+Pause and ask the user to review:
+
+> "Implementation ready. Please review the diff for: spec match, contract match, AC coverage, validation/authorization/ownership explicit and tested, no sensitive data exposed, no out-of-spec behavior. Reply 'approved' or list changes."
+
+Wait for response. If changes requested → apply them and re-ask. Only proceed when approved.
+
+#### 7c. AI review (if selected)
+
+Invoke the superpowers code review skill:
+
+```
+Skill: superpowers:requesting-code-review
+```
+
+That skill spawns an adversarial reviewer that:
+- Tries to find logic bugs and edge cases
+- Tries to find security holes (injection, auth bypass, data leaks)
+- Tries to find performance issues (N+1, blocking calls)
+- Checks the diff against the spec and contract
+
+For each finding the AI reviewer produces, decide:
+- **Apply** — fix it, re-run failing tests
+- **Defer** — log it as a follow-up issue with rationale
+- **Reject** — explain why the reviewer is wrong (and update the spec if it caused confusion)
+
+Loop until the AI reviewer returns no new high-severity findings.
+
+#### 7d. Smoke test (if selected)
+
 Human review confirms the implementation matches the spec, the contract matches real
 behavior, ACs are covered, validation/authorization/ownership are explicit and tested,
 sensitive data is not exposed, and no out-of-spec behavior crept in.
@@ -211,6 +259,20 @@ After review, **generate a real smoke test script** rather than running ad-hoc c
 
 4. **Add a regression test** in the unit/feature suite for every smoke failure
    before marking complete. A bug that came back once will come back again.
+
+5. **Final review gate after fixes** — when all smoke checks pass, ask the user again:
+
+   ```
+   All smoke checks pass after fixes. Run final review? (default: yes)
+
+     [x] Human review of the fix diff
+     [x] AI review (superpowers:requesting-code-review) on the fix
+     [x] Run superpowers:verification-before-completion checklist
+   ```
+
+   The `superpowers:verification-before-completion` skill is mandatory before
+   claiming "done" — it forces evidence (test output, smoke output, lint pass)
+   before any success claim, commit, or PR.
 
 If smoke fails for a reason that is actually a spec gap (the test is right, the spec
 is incomplete) — return to step 1 (Spec) and amend, do not patch around it.

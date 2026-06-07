@@ -63,6 +63,28 @@ Store as `<active-sections>`. Skip any section not in this set.
 - Already have a spec: skip 5 (no assembler)
 - Just want the question list: skip 2–6
 
+### Question 3 — Do you want the ACs reviewed before proceeding?
+
+After producing numbered acceptance criteria (section 2), ask:
+
+```
+ACs are drafted. How do you want to review them? (default: human)
+
+  [x] Human review        — pause and wait for your approval
+  [x] AI review (superpowers:requesting-code-review) — adversarial check for vague,
+                            untestable, or overlapping ACs
+  [ ] Skip review         — proceed straight to handoff
+```
+
+For AI review, the reviewer should look for:
+- ACs that aren't testable ("works well", "user-friendly")
+- ACs that overlap or contradict each other
+- Missing edge cases (empty input, auth failures, rate limits)
+- ACs that hide multiple requirements in one bullet
+
+Apply / defer / reject each finding. Loop until clean before handing off to
+`coding-workflows` or `spec-driven-development`.
+
 ---
 
 ## Task Type 1: New Feature
