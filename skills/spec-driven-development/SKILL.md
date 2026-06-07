@@ -211,8 +211,162 @@ Write tests against the spec and contract, not against code that does not yet ex
 They must fail first. This is the first validation checkpoint: **if you cannot write a
 clear test, the spec is too vague.** Name tests after acceptance criteria where practical
 (e.g. `ac_003_creating_a_post_without_a_title_returns_422`). Security-sensitive behavior
-*must* have tests. Test layers: feature/API (outside-in), unit (pure logic), architecture
-(layering rules), smoke (boots + happy path).
+*must* have tests.
+
+#### 3a. Test layers and the pyramid
+
+Aim roughly for **70% unit / 25% integration / 5% e2e** (by count, not by line):
+
+| Layer | What it tests | Speed | Real deps? | Example |
+|-------|---------------|-------|------------|---------|
+| **Unit** | Pure logic, one function/class | < 10ms | None — pure inputs/outputs | `validate.title('').valid === false` |
+| **Integration** | Two or more layers wired together, real DB/queue/cache | < 1s | Real DB (transactional), real ORM | `POST /api/tasks → row in DB` |
+| **Contract** | The API contract matches reality | < 100ms | None (schema check) | `openapi-validate openapi.yaml` |
+| **Smoke / e2e** | App boots + happy path + one failure path | < 10s total | Everything real | `curl /health → 200` |
+| **Architecture** | Layering rules (handlers don't import the DB driver) | < 50ms | None — static analysis | `deptrac analyse` |
+
+**Rule:** every AC must have at least one test at the **lowest layer that can express it**.
+Don't write an integration test for what a unit test can cover.
+
+#### 3b. AAA pattern (Arrange · Act · Assert)
+
+Every test follows this shape — three visual blocks, blank lines between:
+
+```js
+test('ac_002 creating a task without title returns 422', async () => {
+  // Arrange
+  const payload = { /* no title */ }
+
+  // Act
+  const res = await request(app).post('/api/tasks').send(payload)
+
+  // Assert
+  assert.equal(res.status, 422)
+  assert.match(res.body.error, /title/i)
+})
+```
+
+**Hard rules:**
+- One **act** per test (multiple acts = multiple tests)
+- One **assertion concept** per test — multiple `assert.*` lines on the *same concept* are fine; assertions across unrelated concepts are not
+- **No conditionals** in tests (`if/else`, ternaries) — branching is a sign you need two tests
+- **No loops** in tests — except for parametrised cases via a list and `test.each`
+
+#### 3c. Naming convention
+
+Use one of these consistently across the repo:
+
+| Style | Example |
+|-------|---------|
+| AC-mapped (preferred for SDD) | `ac_003_creating_a_post_without_a_title_returns_422` |
+| Given-When-Then | `given_no_title_when_creating_task_then_returns_422` |
+| should-when | `should_return_422_when_title_is_missing` |
+
+Pick one and never mix. The test name **must** describe the observable outcome — not the function name.
+
+#### 3d. Isolation — every test is hermetic
+
+- **No shared state between tests.** Each test gets a fresh DB transaction (rolled back), a fresh in-memory store, or a fresh container.
+- **No test ordering dependencies.** Tests must pass when run in any order, including alone (`test --filter`).
+- **No real time.** Inject a clock; never `new Date()` inside business logic. Tests freeze time.
+- **No real randomness.** Inject a seed; never `Math.random()` inside business logic.
+- **No real network in unit/integration.** Mock external HTTP at the boundary. Smoke/e2e is the only layer allowed to hit real services.
+
+#### 3e. Test data — factories beat fixtures
+
+- **Factories** (functions that build objects with sensible defaults + overrides) — preferred
+- **Fixtures** (static JSON/YAML files) — only for reference data that rarely changes
+
+```js
+// Good — factory
+function makeTask(overrides = {}) {
+  return { id: 1, title: 'default title', done: false, created_at: '2026-01-01', ...overrides }
+}
+
+// Then in tests:
+const task = makeTask({ title: 'something specific' })
+```
+
+Each test should construct **only the data it cares about**. Defaults handle the rest.
+
+#### 3f. Mocking discipline — when yes, when no
+
+**Mock these:**
+- External HTTP APIs (Stripe, SendGrid, third-party services)
+- The clock (frozen time)
+- Randomness (seeded RNG)
+- Email senders, SMS senders, webhook senders
+- File system writes in unit tests (use in-memory FS)
+
+**Never mock these:**
+- Your own code (use real implementations — the public interface IS the test)
+- The database in **integration tests** (use a real DB with rollback)
+- Pure functions (just call them)
+- Standard library / framework code
+
+**If you find yourself mocking your own service to test another of your services → integration test it instead.** The need to mock internal code is a smell that the boundary is wrong.
+
+#### 3g. Coverage and speed budgets
+
+| Metric | Target |
+|--------|--------|
+| Overall line coverage | ≥ 80% |
+| Critical paths (auth, billing, data integrity) | 100% |
+| Unit test runtime | < 10ms each, full unit suite < 5s |
+| Integration test runtime | < 1s each, full integration suite < 60s |
+| Smoke runtime | < 10s total |
+| Flaky test policy | quarantine after 1 flake; delete or fix within the sprint |
+
+Coverage is a **floor**, not a target. 100% coverage with weak assertions is worse than 80% with strong assertions.
+
+#### 3h. Other patterns to use when they fit
+
+- **Snapshot/golden tests** — for output serializers, generated SQL, API response shapes. Update intentionally, never blindly.
+- **Property-based tests** — for validators, parsers, encoders. Generate 100s of inputs to find edge cases.
+- **Contract tests** — for any consumer-producer pair (e.g. frontend ↔ backend). Run on both sides against the same `openapi.yaml`.
+- **Mutation testing** — periodically run a mutator (Stryker, mutmut) to verify your tests actually catch bugs.
+
+#### 3i. Per-language cheat sheet
+
+| Stack | Test runner | Mocking | DB rollback / isolation | Snapshot | Property-based |
+|-------|-------------|---------|-------------------------|----------|----------------|
+| **Node (built-in)** | `node --test` | `mock.method()` | `BEGIN; ROLLBACK` per test | `assert.snapshot` (3rd-party) | `fast-check` |
+| **Jest / Vitest** | `jest` / `vitest` | `vi.mock` / `jest.mock` | Same | `toMatchSnapshot()` | `fast-check` |
+| **pytest** | `pytest` | `pytest-mock` / `unittest.mock` | `@pytest.fixture(scope='function')` + transactional rollback | `pytest-snapshot` | `hypothesis` |
+| **PHPUnit / Pest** | `pest` / `phpunit` | `Mockery` / `prophecy` | Laravel `RefreshDatabase` trait | `pest-plugin-snapshots` | `eris` |
+| **Go** | `go test` | interfaces + small fakes | testcontainers + transactional helper | `cupaloy` | `gopter` |
+| **Rust** | `cargo test` | `mockall` / trait-based fakes | `sqlx::test` with transactional rollback | `insta` | `proptest` |
+
+#### 3j. Test naming and layout
+
+```
+tests/
+├── unit/                    # pure logic, no I/O
+│   ├── validate.test.js
+│   └── serialize.test.js
+├── integration/             # real DB / real queues, transactional rollback
+│   ├── tasks.create.test.js
+│   └── tasks.list.test.js
+├── contract/                # openapi.yaml ↔ implementation
+│   └── openapi.test.js
+├── e2e/                     # smoke + happy + one failure path
+│   └── tasks.flow.test.js
+└── factories/               # makeTask, makeUser, etc.
+    └── task.js
+```
+
+Mirror the `src/` structure inside `tests/unit/` and `tests/integration/`.
+
+#### 3k. The red-first checklist before writing code
+
+Before moving to Step 4 (Validation+Security), confirm:
+
+- [ ] Every AC has at least one test, at the lowest sensible layer
+- [ ] All tests **fail** when run now (red first)
+- [ ] Test names map back to AC IDs
+- [ ] Factories exist for every entity you create
+- [ ] No real time, randomness, or network in unit/integration tests
+- [ ] Security-sensitive behavior (auth, authz, validation, data exposure) has tests
 
 ### 4. Validation & Security — *part of the contract, not cleanup*
 Before implementing, answer the validation checklist (required/optional fields, types,
