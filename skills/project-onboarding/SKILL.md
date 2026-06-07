@@ -1,6 +1,6 @@
 # Project Onboarding
 
-> Run this at the start of any new project session to bootstrap context, tooling, domain knowledge, architecture understanding, SDD scaffolding, optional diagrams, and (optionally) a Ruflo agent swarm — in one shot.
+> Fast, parallel codebase onboarding. Spawns 4 agents simultaneously to analyze architecture, domain, toolchain, and tech debt — then synthesizes everything into a single `docs/PROJECT.md` with one high-level diagram. No setup questions. No manual pre-flight. Just results.
 
 ## Trigger phrases
 
@@ -14,217 +14,228 @@
 
 ---
 
-## Step 0 — Initialize Claude itself (do this before pasting the prompt)
+## How this skill runs
 
-Run these commands manually in a new Claude Code session before anything else:
+**Do not ask setup questions. Do not wait for user input. Run everything automatically.**
 
-```bash
-cd /path/to/your/project
-/model           # Sonnet 4.6 default, Opus 4.7 for deep architecture work
-/effort          # Set to high for onboarding — you want thorough analysis
-/plugins         # Verify ai-coding-toolkit is enabled
-/context         # Confirm context is fresh
-rtk gain         # Verify RTK token proxy is active
-/mcp             # Verify Ruflo MCP and other servers are connected
-```
+Execute in this exact order:
 
-**Pre-flight checklist:**
+### Step 1 — Create task list (immediately, before anything else)
 
-- [ ] Model set (Sonnet 4.6 default, Opus 4.7 for complex onboarding)
-- [ ] Effort level: `high`
-- [ ] Working directory is the project root
-- [ ] `ai-coding-toolkit` plugin enabled
-- [ ] RTK active
-- [ ] MCP servers visible
-- [ ] Context is fresh (new session, not resumed with stale context)
-
----
-
-## Step 0.5 — Interactive setup questions
-
-Before running the onboarding loop, Claude should ask the user:
-
-1. **MCP servers** — "Which MCP integrations do you want to use? (ruflo, filesystem, github, database, browser, all, none)"
-2. **Multi-agent mode** — "Do you want me to use a Ruflo swarm with parallel agents for analysis? (yes/no)"
-3. **Diagrams** — "Do you want me to generate diagrams of the code architecture and business domain? (yes/no)"
-4. **SDD scaffold** — "Should I scaffold SDD docs (docs/specs/, docs/adr/, docs/api/) if missing? (yes/no)"
-5. **Lint/CI detection** — "Should I detect lint, formatter, and CI pipelines? (yes/no)"
-
-Defaults if user says "use defaults": MCPs=ruflo only, swarm=yes, diagrams=yes, SDD=yes, lint=yes.
-
----
-
-## Onboarding Prompt
-
-Paste this at the start of a new project session:
-
-```
-Onboard this project. Run these steps in order:
-
-**FIRST: Create a TaskCreate task list with one task per step below (steps 0–11). Mark each task `in_progress` when you start it and `completed` when done. This gives the user live visibility into onboarding progress.**
-
-0. **Setup questions** — Ask me about MCPs, swarm mode, diagrams, SDD scaffold, lint detection (per Step 0.5 of the skill). Wait for answers.
-
-1. **Read the codebase** — scan structure, entry points, key files, and dependencies
-
-2. **Initialize selected MCPs** — based on my answers, init only what I chose:
-   - Ruflo: run `ruflo init`, then `ruflo swarm_init --topology mesh --max-agents 4`
-   - Filesystem MCP: confirm read access to project root
-   - GitHub MCP: confirm token + repo access
-   - Database MCP: confirm connection string
-   - Browser MCP: confirm headless browser ready
-
-3. **Initialize RTK** — verify `rtk` is active and token savings are tracked
-
-4. **Multi-agent analysis (if swarm=yes)** — spawn 4 Ruflo agents in parallel via `ruflo agent_spawn`:
-   - Agent A — Architecture: style, layers, boundaries, entry points
-   - Agent B — Domain: business concepts, user stories, value proposition
-   - Agent C — Tech debt: mixed patterns, untyped code, missing tests
-   - Agent D — Tooling: lint, formatter, CI, test runner, build system
-   Synthesize results into a single onboarding report.
-
-   If swarm=no, do all four analyses sequentially in a single context.
-
-5. **Build a knowledge graph** — persist module map, data flows, key relationships, and the synthesized analysis into `memory_store` so future sessions inherit it
-
-6. **Business domain summary** — explain in plain language what this project does, who it serves, and its core value proposition
-
-7. **Architecture summary** — describe architectural style (MVC, hexagonal, event-driven, monolith, microservices, etc.), identify key layers, boundaries, patterns. Note existing ADRs in docs/adr/
-
-8. **Diagrams (if diagrams=yes)** — generate Mermaid diagrams:
-   - **Architecture diagram** — components, layers, data flow between them
-   - **Domain diagram** — entities, relationships, bounded contexts
-   - **Sequence diagrams** — for the 2–3 most important user flows
-   - **C4 model** (if the project is large) — Context, Container, Component levels
-   Save all diagrams to `docs/diagrams/` as `.mmd` files plus a `README.md` index
-
-9. **Lint & pipeline detection (if lint=yes)** — scan for and report:
-   - Lint configs: .eslintrc, ruff.toml, .flake8, phpstan.neon, .golangci.yml, biome.json
-   - Formatters: prettier, black, gofmt, rustfmt
-   - Test runners: pytest, jest, phpunit, go test
-   - CI: .github/workflows/, .gitlab-ci.yml, Jenkinsfile, circle.yml
-   - Pre-commit: .pre-commit-config.yaml, husky, lefthook
-   - Build: package.json scripts, Makefile, justfile, taskfile.yml
-   For each: show the exact command to run it locally
-
-10. **SDD bootstrap (if SDD=yes)** — check if docs/specs/, docs/adr/, docs/api/ exist. If not, scaffold them using the `spec-driven-development` skill. Fill conventions.md and glossary.md with the project's actual stack, layer names, and domain terms (no placeholder values)
-
-11. **Context report** — show current token usage breakdown (`/context`)
-```
-
----
-
-## What each step does
-
-| Step | Tool | Purpose |
-|------|------|---------|
-| 0 | Manual CLI + Claude commands | Configure session before onboarding |
-| 0.5 | Claude interactive Q&A | Personalize the onboarding to user preferences |
-| 1 | Read / Bash / Explore | Build structural understanding |
-| 2 | `ruflo init`, `swarm_init`, MCP configs | Activate only the integrations user wants |
-| 3 | `rtk gain` | Confirm token proxy |
-| 4 | `ruflo agent_spawn` ×4 OR sequential | Parallel codebase analysis |
-| 5 | `memory_store` | Persist knowledge graph |
-| 6 | Claude reasoning | Business domain summary |
-| 7 | Claude reasoning + scan | Architecture summary |
-| 8 | Mermaid generation | Visual code + domain understanding |
-| 9 | File scan | Surface existing lint/CI/build pipelines |
-| 10 | `spec-driven-development` skill | SDD scaffolding |
-| 11 | `/context` | Token budget snapshot |
-
----
-
-## MCP options
-
-| MCP | What it does | When to enable |
-|-----|--------------|----------------|
-| **ruflo** | Memory store, swarm, hooks, agent spawning | Always (foundation) |
-| **filesystem** | Direct read/write to project files | Most projects |
-| **github** | Read PRs, issues, releases, repo metadata | Projects with active GitHub workflow |
-| **database** | Query DB schema, run EXPLAIN, sample data | Data-backed features |
-| **browser** | Read live docs, scrape APIs, screenshot UI | Frontend or API integration work |
-
----
-
-## Diagram options
-
-When diagrams=yes, Claude generates:
-
-| Diagram | Mermaid type | Use case |
-|---------|--------------|----------|
-| Architecture | `graph TD` or `C4Container` | High-level component map |
-| Domain model | `classDiagram` or `erDiagram` | Entities + relationships |
-| Sequence | `sequenceDiagram` | User flows (login, checkout, etc.) |
-| State machine | `stateDiagram-v2` | For features with explicit states |
-| Deployment | `graph LR` | Infra topology |
-
-All diagrams saved to `docs/diagrams/<name>.mmd` with a `docs/diagrams/README.md` index.
-
----
-
-## Architecture summary — what to look for
-
-- **Style** — MVC, hexagonal, clean, event-driven, CQRS, monolith, microservices, serverless
-- **Layers** — controllers, services, repositories, use-cases, handlers — whatever the project calls them
-- **Entry points** — HTTP routes, CLI commands, queue consumers, cron jobs
-- **Boundaries** — where domain ends and infrastructure begins
-- **Key patterns** — DI, repository, domain events, sagas, CQRS
-- **Existing decisions** — ADRs in docs/adr/, ARCHITECTURE.md
-- **Tech debt signals** — mixed patterns, logic in controllers, untested code
-
----
-
-## SDD bootstrap — what gets created
-
-```
-docs/
-├── sdd/00-workflow.md
-├── specs/
-├── adr/
-├── api/openapi.yaml
-├── diagrams/
-│   ├── README.md
-│   ├── architecture.mmd
-│   ├── domain.mmd
-│   └── sequence-*.mmd
-├── conventions.md
-└── glossary.md
-```
-
-**Rules:**
-- Never leave template placeholders — replace with the project's real stack
-- Import any existing ARCHITECTURE.md or ADRs into docs/adr/
-- If stack is unclear, ask once before scaffolding
-
----
-
-## Task list template
-
-When the onboarding starts, Claude should create these tasks via `TaskCreate`:
+Create these tasks via `TaskCreate`:
 
 | # | Subject | activeForm |
 |---|---------|------------|
-| 1 | Ask setup questions (MCPs, swarm, diagrams, SDD, lint) | Asking setup questions |
-| 2 | Read codebase structure | Reading codebase |
-| 3 | Initialize selected MCPs | Initializing MCPs |
-| 4 | Verify RTK token proxy | Verifying RTK |
-| 5 | Run multi-agent analysis (or sequential) | Analyzing codebase |
-| 6 | Persist knowledge graph to memory_store | Persisting knowledge graph |
-| 7 | Write business domain summary | Summarizing domain |
-| 8 | Write architecture summary | Summarizing architecture |
-| 9 | Generate Mermaid diagrams | Generating diagrams |
-| 10 | Detect lint, formatter, CI, build pipelines | Detecting toolchain |
-| 11 | Scaffold or validate SDD docs | Scaffolding SDD |
-| 12 | Show context report | Reporting context usage |
-
-Tasks 9, 10, 11 are skipped if the user opted out in step 0.
+| 1 | Auto-init Ruflo swarm | Initializing swarm |
+| 2 | Run 4 parallel analysis agents | Analyzing codebase |
+| 3 | Write docs/PROJECT.md | Writing onboarding doc |
+| 4 | Scaffold SDD structure if missing | Scaffolding SDD |
 
 ---
 
-## Tips
+### Step 2 — Auto-init Ruflo swarm (fire and proceed, don't block)
 
-- Run this **before** any feature work — it prevents wasted tokens on re-discovery later
-- The knowledge graph + SDD scaffold + diagrams are reused by `coding-workflows`, `spec-driven-development`, and `multi-agent` skills
-- If Ruflo MCP is missing, swarm steps fall back to Claude's native `Agent` tool with `subagent_type=Explore` or `general-purpose`
-- If SDD scaffolding already exists, step 10 becomes a **validation pass** — check that conventions.md and glossary.md reflect the current stack
-- Diagrams should be **regenerated** when major architectural decisions land (after each new ADR)
+Call these MCP tools. If they fail or timeout, fall back to Claude's native Agent tool — do not stop:
+
+```
+mcp__ruflo__swarm_init({ topology: "mesh", maxAgents: 4 })
+```
+
+Mark task 1 completed. Proceed immediately to step 3 regardless of result.
+
+---
+
+### Step 3 — Spawn 4 parallel agents (all in ONE message)
+
+Send ALL four Agent tool calls in a **single message** so they run concurrently.
+
+**Agent A — Architecture**
+```
+Analyze this codebase's technical architecture. Return a structured report covering:
+1. Architectural style (MVC, hexagonal, event-driven, monolith, microservices, serverless, etc.)
+2. Key layers and what each does (controllers, services, repositories, use-cases, handlers, etc.)
+3. Entry points (HTTP routes, CLI commands, queue consumers, cron jobs)
+4. Where domain logic lives vs. infrastructure/framework code
+5. Key patterns in use (DI, repository pattern, domain events, CQRS, sagas)
+6. Top 3 tech debt signals (mixed patterns, logic in wrong layer, untested areas)
+7. A compact Mermaid graph TD diagram showing the top-level components and their relationships.
+   Use max 8 nodes. Label edges with data flow direction. Keep it one screen tall.
+   Format: ```mermaid\ngraph TD\n...```
+
+Return only the structured report. No preamble.
+```
+
+**Agent B — Domain**
+```
+Analyze this codebase to understand its business domain. Return a structured report covering:
+1. What this project does in plain language (1-2 sentences max)
+2. Who uses it and what problem it solves
+3. Core domain concepts / entities (the 5-8 most important nouns in the codebase)
+4. The 3-5 most important user flows or operations the system performs
+5. External dependencies (APIs, third-party services, databases this project talks to)
+
+Return only the structured report. No preamble.
+```
+
+**Agent C — Toolchain**
+```
+Scan this codebase for its development toolchain. Return a structured report with the exact commands to run each tool:
+1. Build: (Makefile, package.json scripts, justfile, taskfile.yml, Cargo.toml, etc.)
+2. Test: (pytest, jest, go test, phpunit, cargo test, rspec, etc.) — include how to run a single test file
+3. Lint: (.eslintrc, ruff.toml, .flake8, phpstan.neon, .golangci.yml, biome.json, etc.)
+4. Format: (prettier, black, gofmt, rustfmt, etc.)
+5. Dev server / run: how to start the app locally
+6. CI pipeline: (.github/workflows/, .gitlab-ci.yml, Jenkinsfile, etc.) — list the key stages
+7. Pre-commit hooks: (.pre-commit-config.yaml, husky, lefthook)
+
+For each found tool, provide the exact command string. If not found, write "not detected".
+Return only the structured report. No preamble.
+```
+
+**Agent D — SDD check**
+```
+Check if this codebase has spec-driven development scaffolding. Return a structured report:
+1. Does docs/specs/ exist? List any spec files found.
+2. Does docs/adr/ exist? List any ADR files found.
+3. Does docs/api/ or an openapi.yaml exist?
+4. Does docs/conventions.md exist?
+5. Does docs/glossary.md exist?
+6. Does docs/diagrams/ exist?
+7. Is there an existing ARCHITECTURE.md, README.md, or CLAUDE.md? Summarize key points from each.
+
+Return only the structured report. No preamble.
+```
+
+Mark task 2 completed when all four agents return.
+
+---
+
+### Step 4 — Write docs/PROJECT.md
+
+Synthesize all four agent reports into a single file: `docs/PROJECT.md`.
+
+Create the `docs/` directory if it doesn't exist.
+
+Use this exact structure:
+
+```markdown
+# PROJECT.md
+
+> Generated by project-onboarding skill. Single source of truth for business context and technical architecture.
+
+## What this project does
+
+{1-3 sentence plain-language summary from Agent B}
+
+## Who uses it
+
+{from Agent B: users + problem solved}
+
+## Core domain concepts
+
+{5-8 key entities/concepts from Agent B, each with a one-line description}
+
+## Architecture
+
+**Style:** {architectural style from Agent A}
+
+**Layers:**
+{table or bullet list: layer name → what it does, from Agent A}
+
+**Entry points:**
+{list from Agent A: HTTP routes, CLI, consumers, cron}
+
+### High-level component map
+
+{Mermaid diagram from Agent A — embed it here, exactly as returned}
+
+## Key user flows
+
+{top 3-5 flows from Agent B, each as a numbered item with 1-2 sentences}
+
+## External dependencies
+
+{from Agent B: APIs, services, databases}
+
+## Development commands
+
+| Task | Command |
+|------|---------|
+| Build | {from Agent C} |
+| Run tests | {from Agent C} |
+| Run single test | {from Agent C} |
+| Lint | {from Agent C} |
+| Format | {from Agent C} |
+| Start dev server | {from Agent C} |
+
+## CI pipeline
+
+{from Agent C: CI system + key stages}
+
+## Tech debt signals
+
+{top 3 from Agent A, each as a bullet with one-line description}
+
+## SDD status
+
+{from Agent D: which docs exist, which are missing}
+```
+
+**Rules:**
+- No placeholder text — every field must have real content from the agent reports
+- The Mermaid diagram goes inline in the file — do NOT create separate `.mmd` files
+- If Agent A's diagram has more than 8 nodes, simplify it before embedding
+- If a field has no data, write "not detected" — never omit the field
+
+Mark task 3 completed.
+
+---
+
+### Step 5 — Scaffold SDD structure if missing
+
+Read Agent D's report. If any of these are missing, create them:
+
+**Missing docs/specs/** → create `docs/specs/.gitkeep`
+**Missing docs/adr/** → create `docs/adr/.gitkeep`
+**Missing docs/conventions.md** → create it with the project's real stack (from Agent C toolchain) and layer names (from Agent A). No placeholder values.
+**Missing docs/glossary.md** → create it with the domain terms from Agent B's core concepts section.
+
+If everything exists, write "SDD structure already in place" and skip.
+
+Mark task 4 completed.
+
+---
+
+### Step 6 — Done
+
+Print a one-line summary:
+```
+Onboarding complete. docs/PROJECT.md written. {N} SDD files scaffolded.
+```
+
+---
+
+## What NOT to do
+
+- Do NOT ask setup questions before starting
+- Do NOT run steps sequentially when they can be parallelized
+- Do NOT generate multiple diagram files — exactly one Mermaid diagram, inline in PROJECT.md
+- Do NOT leave template placeholders in any output file
+- Do NOT block on Ruflo swarm init — if it fails, proceed with Claude native agents
+- Do NOT summarize what you just did at the end beyond the one-line completion message
+
+---
+
+## Fallback: no Ruflo MCP
+
+If `mcp__ruflo__swarm_init` is unavailable, send all four Agent tool calls as Claude native agents in a single message using `subagent_type: "Explore"` for agents A, C, D and `subagent_type: "general-purpose"` for agent B. The rest of the skill is identical.
+
+---
+
+## Relationship to other skills
+
+| Next step | Skill |
+|-----------|-------|
+| Add a feature with SDD discipline | `spec-driven-development` |
+| Deep parallel feature build | `multi-agent` |
+| Build and code review | `code-review` |
