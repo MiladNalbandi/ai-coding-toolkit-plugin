@@ -280,6 +280,14 @@ After review, **generate a real smoke test script** rather than running ad-hoc c
    - At least one failure path returns the correct 4xx with the contract error shape
    - Sensitive fields are NOT in the response
 
+   **Portability rules (macOS + Linux compatible):**
+   - Never use `head -n -1` (BSD `head` does not support negative line counts)
+   - Capture body and status separately: `BODY=$(curl -s -o /tmp/smoke_body.json -w "%{http_code}" ...)` then `STATUS=$?` and `cat /tmp/smoke_body.json`
+   - Never use `date -d` (GNU only) — use `date -u +%Y-%m-%dT%H:%M:%SZ` for timestamps
+   - Never use `grep -P` (PCRE) — use `grep -E` (ERE) which works on both BSD and GNU
+   - Use `command -v` instead of `which` to check for tool presence
+   - Use `mktemp` for temp files, not hardcoded `/tmp/` paths
+
 2. **Run the script** and capture output. Present results as a checklist:
 
    ```

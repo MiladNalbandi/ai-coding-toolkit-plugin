@@ -63,6 +63,39 @@ Store as `<active-sections>`. Skip any section not in this set.
 - Already have a spec: skip 5 (no assembler)
 - Just want the question list: skip 2–6
 
+### Question 2.5 — Identity vs. authentication probe (auto-trigger)
+
+**Trigger:** if the task description contains any of: `user`, `users`, `auth`, `login`,
+`register`, `sign in`, `sign up`, `account`, `member`, `role`, `permission` — ask this
+question BEFORE producing ACs:
+
+```
+Your task mentions "{{matched word}}". Before I write the acceptance criteria, I need
+to understand what "users" means here — these are two very different things:
+
+  A) **Named entities only** — a `users` table with name/email, no login flow.
+     Tasks are linked to a user record. No session, no token, no password.
+     → Small scope. Adds a FK, a user creation endpoint, maybe a list endpoint.
+
+  B) **Authentication** — users can log in, get a token/session, and their identity
+     gates what they can see or do. Password storage, token lifecycle, auth middleware.
+     → Large scope. Adds auth layer, protected routes, session management.
+
+  C) **Authorization only** — auth already exists, you want to control who can do what
+     (roles, ownership checks, permission rules).
+     → Medium scope. No new login flow, just guard existing routes.
+
+Which is it — A, B, C, or a mix? If unsure, describe what a user should be able to DO
+that they cannot do today.
+```
+
+Store answer as `<identity-scope>`. Use it to:
+- Set the AC scope (A → FK + CRUD, B → full auth ACs, C → permission ACs)
+- Flag in the spec: "User means {{A/B/C}} — see AC-U-001 for boundary"
+- If B: recommend handoff to `superpowers:brainstorming` first (auth is a large, non-trivial design decision)
+
+---
+
 ### Question 3 — Do you want the ACs reviewed before proceeding?
 
 After producing numbered acceptance criteria (section 2), ask:
