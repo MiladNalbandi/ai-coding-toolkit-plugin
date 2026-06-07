@@ -44,49 +44,25 @@ Store as `<task-type>`. Skip the question blocks for the other 5 types.
 ### Question 2 — Which sections do you want?
 
 ```
-For task type <task-type>, pick which sections to run (default: all ✅):
+For task type <task-type>, which sections do you want? (default: all ✅)
 
-  ✅ 1. Requirement questions
-         I'll walk you through a checklist of questions for your task type.
-         Uncovers scope, constraints, and edge cases before any code is written.
-         → Best skipped only if you already have clear, written requirements.
+  ✅ 1. Requirement questions     — clarifying checklist for your task type
+  ✅ 2. Acceptance criteria       — numbered, testable ACs (AC-001, AC-002 …)
+  ✅ 3. Definition of Done        — exit checklist: what "done" means here
+  ✅ 4. Red-flag check            — scan for hidden scope, unclear ownership, untestable ACs
+  ✅ 5. Ready-to-send prompt      — filled-in prompt to paste into a new session
+  ✅ 6. Next-step recommendation  — which skill to use next and why
 
-  ✅ 2. Acceptance criteria (AC-001, AC-002 …)
-         I'll produce numbered, testable success conditions from your answers.
-         Each AC maps directly to a test case later.
-         → Best skipped if you already have a spec with ACs.
-
-  ✅ 3. Definition of Done checklist
-         A short exit-criteria checklist: what "done" means for this task type.
-         Prevents "done" from meaning different things to you and the AI.
-         → Best skipped for trivial 1-line fixes.
-
-  ✅ 4. Red-flag check
-         I'll scan your answers for stop-the-line signals — hidden scope,
-         unclear ownership, missing auth decisions, untestable requirements.
-         → Best skipped when you're confident the scope is clean.
-
-  ✅ 5. Ready-to-send prompt (assembler)
-         I'll produce a complete, filled-in prompt you can paste directly
-         into a new session to start implementation immediately.
-         → Best skipped if you're handing off to a spec or plan instead.
-
-  ✅ 6. Next-step recommendation
-         Based on task complexity, I'll suggest which skill to use next:
-         coding-workflows (quick build), spec-driven-development (full SDD),
-         or brainstorming (still fuzzy). Explains why and what to bring.
-         → Best skipped if you already know your next step.
-
-Reply with section numbers to SKIP (e.g. "skip 4, 6") or just press enter for all.
+Reply with section numbers to skip (e.g. "skip 4, 6") or press enter for all.
 ```
 
 Store as `<active-sections>`. Skip any section not in this set.
 
 **Common skip combinations:**
-- Trivial bug fix → skip 3, 6 (no DoD or handoff needed)
-- Already have requirements → skip 1, 3 (go straight to ACs + red-flag)
-- Already have a spec → skip 1, 2, 5 (just want red-flag + handoff)
-- Just exploring → skip 3, 4, 5 (questions + ACs only)
+- Trivial bug fix → skip 3, 6
+- Already have requirements → skip 1, 3
+- Already have a spec → skip 1, 2, 5
+- Just exploring → skip 3, 4, 5
 
 ### Question 2.5 — Identity vs. authentication probe (auto-trigger)
 
