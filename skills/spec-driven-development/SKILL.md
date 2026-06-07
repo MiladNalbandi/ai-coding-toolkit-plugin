@@ -20,6 +20,54 @@ description: >
 
 > **Task:** $ARGUMENTS
 
+---
+
+## Step −1 — Which flow do you want to run?
+
+Before SDD-specific questions, ask the user **which overall flow** fits the task.
+This skill is most powerful when chained with sibling skills.
+
+```
+What flow do you want for `$ARGUMENTS`? (default: 4)
+
+  1. Clarify only         — just produce numbered ACs (clarify-loop)
+                            Use when: you'll implement later or pass to someone else
+  2. Brainstorm → design  — superpowers:brainstorming → writing a design doc
+                            Use when: the idea is fuzzy and needs shape first
+  3. Quick build          — coding-workflows lightweight flow (no spec/contract)
+                            Use when: trivial change, no public contract or data impact
+  4. Full SDD             — spec → contract → red tests → implement → smoke
+                            Use when: data, auth, or API contract is touched
+  5. Full SDD + TDD       — full SDD + superpowers:test-driven-development discipline
+                            Use when: high-risk or regulatory work — strictest mode
+  6. Debug existing bug   — superpowers:systematic-debugging
+                            Use when: this is a bug, not a feature
+  7. Architecture only    — coding-workflows architecture flow + ADR
+                            Use when: you need a decision, not implementation
+
+Reply with the number, or "auto" to let me infer from the task.
+```
+
+Store as `<flow>`.
+
+### Routing table
+
+| Choice | First skill | Then |
+|--------|-------------|------|
+| 1 | `clarify-loop` | stop |
+| 2 | `superpowers:brainstorming` | `superpowers:writing-plans` |
+| 3 | `coding-workflows` | `superpowers:verification-before-completion` |
+| 4 | `clarify-loop` (ACs) | continue with this SDD skill (Step 0 below) |
+| 5 | `clarify-loop` (ACs) | this SDD skill + `superpowers:test-driven-development` for tests |
+| 6 | `superpowers:systematic-debugging` | regression test in this codebase |
+| 7 | `coding-workflows` (Workflow 3) | write ADR via this skill (Step 8) |
+
+If the user picks anything other than **4** or **5**, hand off and exit this skill.
+
+For **4** and **5**, continue with Step 0 below.
+
+---
+
 A process for shipping every meaningful change — from a one-line fix to a new
 feature — through the same loop, so that **intent, contract, validation, security,
 tests, and code never drift apart**. A year later, anyone reading the repo can answer
