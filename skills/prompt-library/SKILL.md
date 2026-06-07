@@ -319,6 +319,50 @@ tell me which logs or artifacts to collect next.
 
 ---
 
+## QUICK START EXAMPLES
+
+### Debug a bug
+
+```
+I have a bug: {{describe what's wrong and where}}.
+Walk me through the debug workflow.
+```
+
+### Fix a bug
+
+```
+Fix this bug: {{paste error or describe behavior}}.
+File: {{path}}, Line: {{number if known}}.
+```
+
+### Add a small feature
+
+```
+Add {{feature}}. Here's the context: {{describe}}.
+```
+
+### Add a non-trivial feature (recommended)
+
+```
+I want to add {{feature}}. Run clarify-loop first, then spec-driven-development.
+```
+
+This forces:
+1. Clarify requirements → numbered acceptance criteria
+2. Write spec + ADR
+3. Define API contract
+4. Red tests first
+5. Implement
+6. Definition of Done checklist
+
+### Golden rule — always start here
+
+```
+Before we start, help me confirm the requirements for: {{task}}
+```
+
+---
+
 ## Tips for Better Prompts
 
 ### Do
