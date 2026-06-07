@@ -12,7 +12,7 @@
     "mcp-toolkit"
   ],
   "triggers": {
-    "project-onboarding": ["onboard this project", "init project", "start a new project", "analyze this codebase", "what does this project do"],
+    "project-onboarding": ["onboard this project", "init project", "start a new project", "analyze this codebase", "what does this project do", "bootstrap sdd", "scaffold docs"],
     "spec-driven-development": ["spec", "write a spec", "acceptance criteria", "ADR", "contract first", "feature the right way", "set up SDD"],
     "coding-workflows": ["build", "implement", "develop", "create feature", "add feature"],
     "clarify-loop": ["start", "begin", "plan", "before coding", "what should I"],
