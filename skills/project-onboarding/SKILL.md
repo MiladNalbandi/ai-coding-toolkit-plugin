@@ -25,10 +25,18 @@ Execute in this exact order:
 Ask the user exactly this, then wait for their answer before proceeding:
 
 > **What do you want to use this onboarding for?**
-> 1. Getting up to speed as a new contributor
-> 2. Planning a new feature or change
-> 3. Debugging / understanding existing behavior
-> 4. Full audit (all of the above)
+>
+> **1. Getting up to speed as a new contributor**
+> Focuses on how the codebase is structured, where things live, and how to run it locally. Best for someone joining the project for the first time.
+>
+> **2. Planning a new feature or change**
+> Focuses on domain concepts, existing patterns, and which layers your change will touch. Best before writing a spec or starting implementation.
+>
+> **3. Debugging / understanding existing behavior**
+> Focuses on entry points, data flow, and how components connect. Best when you need to trace a bug or understand why something behaves the way it does.
+>
+> **4. Full audit**
+> Covers everything: structure, domain, patterns, tech debt, and gaps. Best for a deep review or before a major refactor.
 
 Store their answer as `<onboarding-goal>`. Use it to focus agent prompts in Step 3.
 
