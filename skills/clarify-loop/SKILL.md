@@ -1,4 +1,18 @@
+---
+name: clarify-loop
+description: >
+  Clarifying questions to answer BEFORE writing any code, for six task types: new
+  feature, bug fix, performance, refactor, API integration, and architecture. Produces
+  numbered acceptance criteria and carries a Definition of Done checklist. Use at the
+  very start of any task to remove ambiguity. Trigger on "before I start", "help me
+  plan", "what should I ask", "I want to build or fix X but am not sure where to begin".
+command: /clarify
+---
+
 # Clarify Loop — Ask Before You Code
+
+> **Task:** $ARGUMENTS
+
 
 > **The rule:** never start any coding task without answering these questions first. Ambiguity at the start costs 10x more than clarity.
 
@@ -41,7 +55,7 @@ Before writing any code:
 Then implement one step at a time, naming tests after the AC they cover.
 ```
 
-> **Upgrade path:** the moment you write numbered ACs, you're doing spec-driven development. For anything non-trivial, save these ACs into `docs/specs/NNN-feature.md` and run the `spec-driven-development` loop — it carries the ACs all the way through contract, tests, and the Definition of Done.
+> **Upgrade path:** the moment you write numbered ACs, you're doing spec-driven development. For anything non-trivial, save these ACs into `docs/specs/NNN-feature.md` and run the `spec-driven-development` loop.
 
 ---
 
@@ -232,20 +246,21 @@ Before ANY coding task, ask yourself these five questions. If you can't answer t
 - You're about to change a public interface or database schema
 - The task feels bigger than 1 day of work without a plan
 
+
 ---
 
 ## Definition of Done (adopted from spec-driven-development)
 
-A change is mergeable only when **all** of these hold. Use this as the exit checklist for any feature:
+A change is mergeable only when **all** of these hold:
 
-- [ ] The requirements are captured as **numbered acceptance criteria** (AC-001, AC-002, …), each observable and testable.
+- [ ] Requirements captured as **numbered acceptance criteria** (AC-001, AC-002, …), each observable and testable.
 - [ ] Tests exist, map back to ACs by name, and **failed before** implementation (red-first).
-- [ ] Input validation is explicit and tested (required/optional, types, format, length, range, allowed values, cross-field, uniqueness).
+- [ ] Input validation is explicit and tested.
 - [ ] Authentication, authorization, and **ownership** rules are explicit and tested.
 - [ ] Sensitive/internal fields are not exposed; error responses are intentional.
-- [ ] For HTTP features: the API contract (OpenAPI/proto/GraphQL) was updated **before** the code and matches real behavior.
-- [ ] Formatter, static analysis, full test suite, and a small smoke test all pass.
+- [ ] For HTTP features: the API contract was updated **before** the code and matches real behavior.
+- [ ] Formatter, static analysis, full test suite, and a smoke test all pass.
 - [ ] No behavior outside the agreed ACs was added (**YAGNI**).
 - [ ] Any non-obvious decision has an ADR.
 
-> The full discipline behind this checklist lives in the `spec-driven-development` skill. This clarify loop is where you *start* that discipline — by turning a vague request into numbered ACs before any code exists.
+> The full discipline behind this checklist lives in the `spec-driven-development` skill.

@@ -1,3 +1,13 @@
+---
+name: multi-agent
+description: >
+  Fan out independent work across multiple agents via Ruflo swarm (or Claude native
+  Agent tool as fallback). Use for codebase-wide analysis, parallel feature builds,
+  adversarial review, and large migrations. Trigger on "spawn agents", "run in parallel",
+  "fan out", "multi-agent review", "swarm this", "parallel analysis".
+command: /multi-agent
+---
+
 # Multi-Agent — Parallel Work via Ruflo Swarm & Subagents
 
 > Fan out independent work across multiple agents. Use this for codebase-wide analysis, parallel feature builds, adversarial review, and large migrations. Backed by Ruflo's `swarm_init` + `agent_spawn` MCP tools, or Claude's native Agent tool when Ruflo is unavailable.

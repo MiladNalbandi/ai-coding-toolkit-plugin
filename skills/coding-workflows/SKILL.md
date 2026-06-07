@@ -1,4 +1,18 @@
+---
+name: coding-workflows
+description: >
+  Step-by-step workflows for feature development, debugging, architecture decisions,
+  and code review, each with ready-to-use prompts for every stage. Use when starting
+  any coding task — building a feature, fixing a bug, designing a system, or reviewing
+  code. Hands off to spec-driven-development for rigorous feature work. Trigger on
+  "how do I approach this", "debug this", "review my code", "design the architecture for".
+command: /workflow
+---
+
 # Coding Workflows — AI-Assisted Development
+
+> **Applying to:** $ARGUMENTS
+
 
 > Step-by-step processes for the four most common coding tasks. Follow the order. Never skip Clarify and Design — they prevent 80% of rework.
 
@@ -6,9 +20,9 @@
 
 ## Workflow 1: Feature Development
 
-> **For rigorous, traceable feature work, use the `spec-driven-development` skill instead of this lightweight flow.** SDD enforces a spec → contract → red-tests → implement → Definition-of-Done loop with numbered acceptance criteria. The steps below are the fast path for small changes; SDD is the disciplined path for anything that touches data, auth, or a public contract.
+> **For rigorous, traceable feature work, use the `spec-driven-development` skill instead of this lightweight flow.** It enforces a spec → contract → red-tests → implement → Definition-of-Done loop with numbered acceptance criteria. The steps below are the fast path for small changes.
 >
-> Quick rule: if the change has acceptance criteria worth numbering, or touches validation / authorization / an API contract → switch to `spec-driven-development`. Otherwise the steps below are enough.
+> Rule: if the change has acceptance criteria worth numbering, or touches validation / authorization / an API contract → switch to `spec-driven-development`. Otherwise the steps below are enough.
 
 ### Step 1 — Clarify requirements first
 

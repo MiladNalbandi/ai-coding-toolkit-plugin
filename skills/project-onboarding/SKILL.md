@@ -1,3 +1,15 @@
+---
+name: project-onboarding
+description: >
+  Parallel codebase onboarding with one focused question upfront. Spawns 5 agents
+  simultaneously via Ruflo swarm (or Claude native Agents as fallback), builds a
+  knowledge graph, writes CLAUDE.md + docs/PROJECT.md, generates Mermaid diagrams,
+  detects toolchain (lint/CI/build), persists findings to Ruflo memory, and onboards
+  Serena. Trigger on "onboard this project", "init project", "start a new project",
+  "analyze this codebase", "what does this project do", "bootstrap sdd", "scaffold docs".
+command: /onboard
+---
+
 # Project Onboarding
 
 > Parallel codebase onboarding with one focused question upfront. Spawns 5 agents simultaneously, builds a knowledge graph, writes CLAUDE.md + docs/PROJECT.md, persists findings to Ruflo memory, and onboards Serena.

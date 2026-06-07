@@ -1,4 +1,17 @@
+---
+name: mcp-toolkit
+description: >
+  How to set up and use MCP servers for coding — filesystem, browser (Claude in Chrome),
+  GitHub, and database — with key prompts and workflow integration for each. Use when
+  wiring up MCP tools or deciding which MCP to use for a coding task. Trigger on
+  "set up MCP", "use the filesystem or github or database tool", "which MCP should I use".
+command: /mcp-setup
+---
+
 # MCP Toolkit — AI Coding with Real Tools
+
+> **MCP task:** $ARGUMENTS
+
 
 > MCPs (Model Context Protocol servers) let your AI coding assistant read files, browse docs, query databases, and interact with GitHub — without you pasting anything manually.
 

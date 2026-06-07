@@ -1,4 +1,17 @@
+---
+name: prompt-library
+description: >
+  A library of ready-to-paste prompt templates for AI-assisted coding across implement,
+  debug, review, test, architecture, and ops categories. Use when you need a
+  well-structured prompt for a specific coding task. Trigger on "give me a prompt for",
+  "how should I ask the AI to", "template for debugging or testing or review".
+command: /prompts
+---
+
 # Prompt Library — Ready-to-Use AI Coding Templates
+
+> **Looking for a prompt for:** $ARGUMENTS
+
 
 > Copy, fill in the `{{placeholders}}`, and send. Organized by task category.
 
@@ -315,50 +328,6 @@ Does it fail consistently or flakily? {{answer}}
 
 Diagnose and give me the fix. If the root cause is unclear,
 tell me which logs or artifacts to collect next.
-```
-
----
-
-## QUICK START EXAMPLES
-
-### Debug a bug
-
-```
-I have a bug: {{describe what's wrong and where}}.
-Walk me through the debug workflow.
-```
-
-### Fix a bug
-
-```
-Fix this bug: {{paste error or describe behavior}}.
-File: {{path}}, Line: {{number if known}}.
-```
-
-### Add a small feature
-
-```
-Add {{feature}}. Here's the context: {{describe}}.
-```
-
-### Add a non-trivial feature (recommended)
-
-```
-I want to add {{feature}}. Run clarify-loop first, then spec-driven-development.
-```
-
-This forces:
-1. Clarify requirements → numbered acceptance criteria
-2. Write spec + ADR
-3. Define API contract
-4. Red tests first
-5. Implement
-6. Definition of Done checklist
-
-### Golden rule — always start here
-
-```
-Before we start, help me confirm the requirements for: {{task}}
 ```
 
 ---
