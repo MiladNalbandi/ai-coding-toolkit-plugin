@@ -166,6 +166,39 @@ map to one or more tests. A spec is **frozen once a test references it** — aft
 change it only via a dated amendment block or a new superseding spec, never a silent
 edit.
 
+#### 1a. Spec approval gate — MANDATORY before continuing
+
+After writing the spec, **stop and get explicit user approval before anything else**.
+The spec is the source of truth for every subsequent step; a wrong spec cascades into
+wrong contracts, wrong tests, and wrong code.
+
+**Use `AskUserQuestion` (single-select)** to present approval choices. First show the
+spec file path and the AC list inline, then ask:
+
+```json
+{
+  "question": "Spec written to docs/specs/NNN-feature-name.md with {{N}} ACs. Approve?",
+  "header": "Spec approval",
+  "multiSelect": false,
+  "options": [
+    { "label": "✅ Approve — proceed to contract / tests", "description": "Lock the spec. From here, changes require a dated amendment block." },
+    { "label": "✏️  Edit ACs — change specific acceptance criteria", "description": "I'll ask which ACs to change, apply the edits, then re-ask for approval." },
+    { "label": "🔄 Rewrite section — Goal / Validation / Auth / Edge cases / Out of scope", "description": "I'll ask which section, rewrite it, then re-ask for approval." },
+    { "label": "🤖 Run AI review first (superpowers:requesting-code-review)", "description": "Adversarial review catches vague, untestable, or overlapping ACs before you approve." },
+    { "label": "❌ Reject — go back to clarify-loop", "description": "The spec doesn't match my intent. Restart clarification with what's missing." }
+  ]
+}
+```
+
+**Behavior per choice:**
+- **Approve** → mark the spec as frozen, write `Frozen: <date>` in the spec footer, continue to Step 2
+- **Edit ACs** → use `AskUserQuestion` again to pick which AC numbers, apply changes, loop back to 1a
+- **Rewrite section** → use `AskUserQuestion` again to pick the section, rewrite, loop back to 1a
+- **AI review** → invoke `superpowers:requesting-code-review` on the spec, surface findings, loop back to 1a
+- **Reject** → exit SDD, hand off to `ai-coding-toolkit:clarify-loop` with the original task
+
+Do **not** proceed to Step 2 until the user picks Approve.
+
 ### 2. Contract — *machine-readable counterpart of the spec* (HTTP features only)
 Update the API contract (`docs/api/openapi.yaml`, or the project's gRPC/GraphQL/proto
 equivalent) **before** application code. Prose and contract must agree. Every endpoint
