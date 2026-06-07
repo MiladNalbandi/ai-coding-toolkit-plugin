@@ -61,6 +61,8 @@ Paste this at the start of a new project session:
 ```
 Onboard this project. Run these steps in order:
 
+**FIRST: Create a TaskCreate task list with one task per step below (steps 0–11). Mark each task `in_progress` when you start it and `completed` when done. This gives the user live visibility into onboarding progress.**
+
 0. **Setup questions** — Ask me about MCPs, swarm mode, diagrams, SDD scaffold, lint detection (per Step 0.5 of the skill). Wait for answers.
 
 1. **Read the codebase** — scan structure, entry points, key files, and dependencies
@@ -193,6 +195,29 @@ docs/
 - Never leave template placeholders — replace with the project's real stack
 - Import any existing ARCHITECTURE.md or ADRs into docs/adr/
 - If stack is unclear, ask once before scaffolding
+
+---
+
+## Task list template
+
+When the onboarding starts, Claude should create these tasks via `TaskCreate`:
+
+| # | Subject | activeForm |
+|---|---------|------------|
+| 1 | Ask setup questions (MCPs, swarm, diagrams, SDD, lint) | Asking setup questions |
+| 2 | Read codebase structure | Reading codebase |
+| 3 | Initialize selected MCPs | Initializing MCPs |
+| 4 | Verify RTK token proxy | Verifying RTK |
+| 5 | Run multi-agent analysis (or sequential) | Analyzing codebase |
+| 6 | Persist knowledge graph to memory_store | Persisting knowledge graph |
+| 7 | Write business domain summary | Summarizing domain |
+| 8 | Write architecture summary | Summarizing architecture |
+| 9 | Generate Mermaid diagrams | Generating diagrams |
+| 10 | Detect lint, formatter, CI, build pipelines | Detecting toolchain |
+| 11 | Scaffold or validate SDD docs | Scaffolding SDD |
+| 12 | Show context report | Reporting context usage |
+
+Tasks 9, 10, 11 are skipped if the user opted out in step 0.
 
 ---
 
