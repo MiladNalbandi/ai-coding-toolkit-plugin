@@ -20,6 +20,51 @@ Answer the questions for your task type below, then use the assembler template t
 
 ---
 
+## Step 0 — Ask the user which clarify track to run
+
+Before any clarification, ask the user **two questions** and wait for answers.
+
+### Question 1 — Which task type?
+
+```
+What kind of task is `$ARGUMENTS`? Pick one (default: 1):
+
+  1. New feature        — building something that does not exist yet
+  2. Bug fix            — something is broken, find and fix root cause
+  3. Performance        — too slow, hits a deadline, or costs too much
+  4. Refactor           — change shape without changing behavior
+  5. API integration    — wire up an external service
+  6. Architecture       — irreversible decision, pick an approach
+
+Reply with the number, or "auto" to let me infer from the task description.
+```
+
+Store as `<task-type>`. Skip the question blocks for the other 5 types.
+
+### Question 2 — Which sections do you want?
+
+```
+For task type <task-type>, which sections should we run? (default: all)
+
+  [x] 1. Questions to answer       — the clarifying checklist
+  [x] 2. Numbered acceptance criteria (AC-001, AC-002 …)
+  [x] 3. Definition of Done checklist
+  [x] 4. Red-flag check            — stop-the-line signals
+  [x] 5. Assembler                 — final prompt you can paste to start work
+  [x] 6. Handoff suggestion        — point to coding-workflows or spec-driven-development
+
+Reply with section numbers to SKIP (e.g. "skip 4, 6") or "all".
+```
+
+Store as `<active-sections>`. Skip any section not in this set.
+
+**Common skip combinations:**
+- Trivial bug fix: skip 6 (no handoff needed)
+- Already have a spec: skip 5 (no assembler)
+- Just want the question list: skip 2–6
+
+---
+
 ## Task Type 1: New Feature
 
 ### Questions to answer
