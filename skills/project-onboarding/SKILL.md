@@ -1,6 +1,6 @@
 # Project Onboarding
 
-> Fast, parallel codebase onboarding. Spawns 4 agents simultaneously to analyze architecture, domain, toolchain, and tech debt — then synthesizes everything into a single `docs/PROJECT.md` with one high-level diagram. No setup questions. No manual pre-flight. Just results.
+> Parallel codebase onboarding with one focused question upfront. Spawns 5 agents simultaneously, builds a knowledge graph, writes CLAUDE.md + docs/PROJECT.md, persists findings to Ruflo memory, and onboards Serena.
 
 ## Trigger phrases
 
@@ -16,56 +16,73 @@
 
 ## How this skill runs
 
-**Do not ask setup questions. Do not wait for user input. Run everything automatically.**
-
 Execute in this exact order:
 
-### Step 1 — Create task list (immediately, before anything else)
+---
+
+### Step 0 — Ask one question
+
+Ask the user exactly this, then wait for their answer before proceeding:
+
+> **What do you want to use this onboarding for?**
+> 1. Getting up to speed as a new contributor
+> 2. Planning a new feature or change
+> 3. Debugging / understanding existing behavior
+> 4. Full audit (all of the above)
+
+Store their answer as `<onboarding-goal>`. Use it to focus agent prompts in Step 3.
+
+---
+
+### Step 1 — Create task list
 
 Create these tasks via `TaskCreate`:
 
 | # | Subject | activeForm |
 |---|---------|------------|
-| 1 | Init Ruflo session and swarm | Initializing Ruflo |
-| 2 | Run 4 parallel analysis agents | Analyzing codebase |
-| 3 | Write docs/PROJECT.md | Writing onboarding doc |
+| 1 | Init Ruflo and Serena | Initializing |
+| 2 | Run 5 parallel analysis agents | Analyzing codebase |
+| 3 | Write docs/PROJECT.md | Writing PROJECT.md |
 | 4 | Write CLAUDE.md | Writing CLAUDE.md |
-| 5 | Store findings in Ruflo memory | Persisting to memory |
-| 6 | Scaffold SDD structure if missing | Scaffolding SDD |
+| 5 | Build knowledge graph | Building knowledge graph |
+| 6 | Persist to Ruflo and Serena memory | Persisting to memory |
+| 7 | Scaffold SDD structure | Scaffolding SDD |
 
 ---
 
-### Step 2 — Init Ruflo (fire and proceed, don't block)
+### Step 2 — Init Ruflo and Serena (fire and proceed, don't block)
 
-Call ALL three MCP tools in a **single message** (parallel). If any fail, proceed anyway — never block:
+Send ALL four calls in a **single message**. If any fail, proceed — never block:
 
 ```
 mcp__ruflo__hooks_session-start({ sessionId: "<project-name>-onboarding" })
 mcp__ruflo__hooks_init({})
-mcp__ruflo__swarm_init({ topology: "mesh", maxAgents: 4 })
+mcp__ruflo__swarm_init({ topology: "mesh", maxAgents: 5 })
+mcp__serena__onboarding({})
 ```
 
-Derive `<project-name>` from the repo root folder name or `package.json`/`composer.json`/`Cargo.toml` name field.
+Derive `<project-name>` from the repo root folder name or the `name` field in `package.json` / `Cargo.toml` / `composer.json` / `pyproject.toml`.
 
 Mark task 1 completed. Proceed immediately to step 3 regardless of result.
 
 ---
 
-### Step 3 — Spawn 4 parallel agents (all in ONE message)
+### Step 3 — Spawn 5 parallel agents (all in ONE message)
 
-Send ALL four Agent tool calls in a **single message** so they run concurrently.
+Send ALL five Agent tool calls in a **single message** so they run concurrently.
+Append `<onboarding-goal>` context to each prompt so agents tailor their depth.
 
 **Agent A — Architecture**
 ```
-Analyze this codebase's technical architecture. Return a structured report covering:
+Analyze this codebase's technical architecture. Focus: <onboarding-goal>.
+Return a structured report:
 1. Architectural style (MVC, hexagonal, event-driven, monolith, microservices, serverless, etc.)
 2. Key layers and what each does (controllers, services, repositories, use-cases, handlers, etc.)
 3. Entry points (HTTP routes, CLI commands, queue consumers, cron jobs)
 4. Where domain logic lives vs. infrastructure/framework code
 5. Key patterns in use (DI, repository pattern, domain events, CQRS, sagas)
 6. Top 3 tech debt signals (mixed patterns, logic in wrong layer, untested areas)
-7. A compact Mermaid graph TD diagram showing the top-level components and their relationships.
-   Use max 8 nodes. Label edges with data flow direction. Keep it one screen tall.
+7. A compact Mermaid graph TD diagram — max 8 nodes, edges labelled with data flow direction.
    Format: ```mermaid\ngraph TD\n...```
 
 Return only the structured report. No preamble.
@@ -73,61 +90,78 @@ Return only the structured report. No preamble.
 
 **Agent B — Domain**
 ```
-Analyze this codebase to understand its business domain. Return a structured report covering:
+Analyze this codebase's business domain. Focus: <onboarding-goal>.
+Return a structured report:
 1. What this project does in plain language (1-2 sentences max)
 2. Who uses it and what problem it solves
-3. Core domain concepts / entities (the 5-8 most important nouns in the codebase)
-4. The 3-5 most important user flows or operations the system performs
-5. External dependencies (APIs, third-party services, databases this project talks to)
+3. Core domain concepts / entities (5-8 most important nouns in the codebase)
+4. The 3-5 most important user flows or operations
+5. External dependencies (APIs, third-party services, databases)
 
 Return only the structured report. No preamble.
 ```
 
 **Agent C — Toolchain**
 ```
-Scan this codebase for its development toolchain. Return a structured report with the exact commands to run each tool:
-1. Build: (Makefile, package.json scripts, justfile, taskfile.yml, Cargo.toml, etc.)
-2. Test: (pytest, jest, go test, phpunit, cargo test, rspec, etc.) — include how to run a single test file
-3. Lint: (.eslintrc, ruff.toml, .flake8, phpstan.neon, .golangci.yml, biome.json, etc.)
-4. Format: (prettier, black, gofmt, rustfmt, etc.)
-5. Dev server / run: how to start the app locally
-6. CI pipeline: (.github/workflows/, .gitlab-ci.yml, Jenkinsfile, etc.) — list the key stages
-7. Pre-commit hooks: (.pre-commit-config.yaml, husky, lefthook)
+Scan this codebase for its development toolchain. Return exact commands for:
+1. Build (Makefile, package.json scripts, justfile, taskfile.yml, Cargo.toml, etc.)
+2. Test — include how to run a single test file
+3. Lint (.eslintrc, ruff.toml, .flake8, phpstan.neon, .golangci.yml, biome.json, etc.)
+4. Format (prettier, black, gofmt, rustfmt, etc.)
+5. Dev server / run locally
+6. CI pipeline (.github/workflows/, .gitlab-ci.yml, Jenkinsfile) — list key stages
+7. Pre-commit hooks (.pre-commit-config.yaml, husky, lefthook)
 
-For each found tool, provide the exact command string. If not found, write "not detected".
-Return only the structured report. No preamble.
+For each: exact command string, or "not detected". Return only the report. No preamble.
 ```
 
 **Agent D — SDD check**
 ```
-Check if this codebase has spec-driven development scaffolding. Return a structured report:
-1. Does docs/specs/ exist? List any spec files found.
-2. Does docs/adr/ exist? List any ADR files found.
-3. Does docs/api/ or an openapi.yaml exist?
+Check this codebase for spec-driven development scaffolding. Return a structured report:
+1. Does docs/specs/ exist? List spec files.
+2. Does docs/adr/ exist? List ADR files.
+3. Does docs/api/ or openapi.yaml exist?
 4. Does docs/conventions.md exist?
 5. Does docs/glossary.md exist?
-6. Does docs/diagrams/ exist?
-7. Is there an existing ARCHITECTURE.md, README.md, or CLAUDE.md? Summarize key points from each.
+6. Is there ARCHITECTURE.md, README.md, or CLAUDE.md? Summarize key points.
 
-Return only the structured report. No preamble.
+Return only the report. No preamble.
 ```
 
-Mark task 2 completed when all four agents return.
+**Agent E — Knowledge graph**
+```
+Analyze this codebase and extract a knowledge graph of its entities and relationships.
+
+Return a JSON object with exactly this shape:
+{
+  "entities": [
+    { "id": "short-kebab-id", "name": "Display Name", "type": "service|module|model|controller|repository|queue|database|external-api|cli-command|event", "description": "one line" }
+  ],
+  "edges": [
+    { "from": "entity-id", "to": "entity-id", "relation": "calls|depends-on|inherits|stores-to|reads-from|publishes|subscribes-to|triggers" }
+  ]
+}
+
+Rules:
+- Include max 20 entities — only the most important ones
+- Every entity in edges must exist in entities
+- No duplicate edges
+- Return only the raw JSON object. No markdown, no preamble.
+```
+
+Mark task 2 completed when all five agents return.
 
 ---
 
 ### Step 4 — Write docs/PROJECT.md
 
-Synthesize all four agent reports into a single file: `docs/PROJECT.md`.
-
-Create the `docs/` directory if it doesn't exist.
-
-Use this exact structure:
+Create `docs/` if it doesn't exist. Synthesize all agent reports into `docs/PROJECT.md`:
 
 ```markdown
 # PROJECT.md
 
 > Generated by project-onboarding skill. Single source of truth for business context and technical architecture.
+> Onboarding goal: <onboarding-goal>
 
 ## What this project does
 
@@ -143,25 +177,25 @@ Use this exact structure:
 
 ## Architecture
 
-**Style:** {architectural style from Agent A}
+**Style:** {from Agent A}
 
 **Layers:**
-{table or bullet list: layer name → what it does, from Agent A}
+{table or bullet: layer → what it does, from Agent A}
 
 **Entry points:**
-{list from Agent A: HTTP routes, CLI, consumers, cron}
+{list from Agent A}
 
 ### High-level component map
 
-{Mermaid diagram from Agent A — embed it here, exactly as returned}
+{Mermaid diagram from Agent A — embed inline, do NOT create a separate file}
 
 ## Key user flows
 
-{top 3-5 flows from Agent B, each as a numbered item with 1-2 sentences}
+{top 3-5 flows from Agent B, numbered, 1-2 sentences each}
 
 ## External dependencies
 
-{from Agent B: APIs, services, databases}
+{from Agent B}
 
 ## Development commands
 
@@ -176,33 +210,30 @@ Use this exact structure:
 
 ## CI pipeline
 
-{from Agent C: CI system + key stages}
+{from Agent C}
 
 ## Tech debt signals
 
-{top 3 from Agent A, each as a bullet with one-line description}
+{top 3 from Agent A, bullet + one line each}
 
 ## SDD status
 
 {from Agent D: which docs exist, which are missing}
 ```
 
-**Rules:**
-- No placeholder text — every field must have real content from the agent reports
-- The Mermaid diagram goes inline in the file — do NOT create separate `.mmd` files
-- If Agent A's diagram has more than 8 nodes, simplify it before embedding
+Rules:
+- No placeholder text — every field must have real content
+- Mermaid diagram inline — no separate `.mmd` files
 - If a field has no data, write "not detected" — never omit the field
 
 Mark task 3 completed.
 
 ---
 
-### Step 3b — Write CLAUDE.md
+### Step 4b — Write CLAUDE.md
 
-If a `CLAUDE.md` already exists, add missing sections only — do not overwrite existing content.
-If it does not exist, create it now using Agent A and Agent C data.
-
-Use this exact structure:
+If `CLAUDE.md` already exists, add missing sections only — do not overwrite existing content.
+If it does not exist, create it:
 
 ```markdown
 # CLAUDE.md
@@ -222,115 +253,132 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Architecture
 
-**Style:** {architectural style from Agent A}
+**Style:** {from Agent A}
 
 **Layers:**
-{bullet list: layer name → what it does, from Agent A}
+{bullet: layer → what it does}
 
-**Entry points:** {from Agent A — HTTP routes, CLI, consumers, cron}
+**Entry points:** {from Agent A}
 
-**Key patterns:** {from Agent A — DI, repo pattern, domain events, CQRS, etc.}
+**Key patterns:** {from Agent A}
 
 **Domain logic lives in:** {specific folder/layer from Agent A}
 ```
 
 Rules:
-- Every command must be a real command string — no placeholders like `<command>`
-- If a tool was "not detected" by Agent C, omit that row from the table entirely
-- Keep it under 60 lines — CLAUDE.md is a quick-reference, not a full doc
-
----
-
-### Step 4 — Store findings in Ruflo memory
-
-Call `mcp__ruflo__memory_store` for each entry below in a **single message** (all parallel). Use `upsert: true` so re-running onboarding updates existing entries rather than failing.
-
-```
-mcp__ruflo__memory_store({
-  key: "<project-name>:domain",
-  namespace: "project",
-  upsert: true,
-  value: {
-    summary: "<1-2 sentence plain-language description from Agent B>",
-    users: "<who uses it>",
-    coreConcepts: ["<concept1>", "<concept2>", "..."],
-    keyFlows: ["<flow1>", "<flow2>", "..."],
-    externalDeps: ["<dep1>", "<dep2>", "..."]
-  }
-})
-
-mcp__ruflo__memory_store({
-  key: "<project-name>:architecture",
-  namespace: "project",
-  upsert: true,
-  value: {
-    style: "<architectural style from Agent A>",
-    layers: { "<layer>": "<what it does>", "...": "..." },
-    entryPoints: ["<entry1>", "..."],
-    patterns: ["<pattern1>", "..."],
-    techDebt: ["<debt1>", "<debt2>", "<debt3>"]
-  }
-})
-
-mcp__ruflo__memory_store({
-  key: "<project-name>:toolchain",
-  namespace: "project",
-  upsert: true,
-  value: {
-    build: "<command>",
-    test: "<command>",
-    singleTest: "<command>",
-    lint: "<command>",
-    format: "<command>",
-    devServer: "<command>",
-    ci: "<CI system and key stages>"
-  }
-})
-```
+- Real command strings only — omit any row where tool was "not detected"
+- Keep under 60 lines
 
 Mark task 4 completed.
 
 ---
 
-### Step 5 — Scaffold SDD structure if missing
+### Step 5 — Build knowledge graph
 
-Read Agent D's report. If any of these are missing, create them:
+Write `docs/knowledge-graph.json` using Agent E's JSON output exactly as returned.
 
-**Missing docs/specs/** → create `docs/specs/.gitkeep`
-**Missing docs/adr/** → create `docs/adr/.gitkeep`
-**Missing docs/conventions.md** → create it with the project's real stack (from Agent C toolchain) and layer names (from Agent A). No placeholder values.
-**Missing docs/glossary.md** → create it with the domain terms from Agent B's core concepts section.
+Then render a summary table to the user:
 
-If everything exists, write "SDD structure already in place" and skip.
+```
+Knowledge graph: {N} entities, {M} edges
+Top entity types: {type: count, type: count, ...}
+```
 
-Mark task 4 completed.
+Mark task 5 completed.
 
 ---
 
-### Step 6 — Done
+### Step 6 — Persist to Ruflo and Serena memory
 
-Print a one-line summary:
+Send ALL calls in a **single message** (parallel). Use `upsert: true` for Ruflo.
+
+**Ruflo memory (4 entries):**
+
 ```
-Onboarding complete. CLAUDE.md written. docs/PROJECT.md written. 3 Ruflo memory entries stored. {N} SDD files scaffolded.
+mcp__ruflo__memory_store({
+  key: "<project-name>:domain", namespace: "project", upsert: true,
+  value: { summary, users, coreConcepts, keyFlows, externalDeps }
+})
+
+mcp__ruflo__memory_store({
+  key: "<project-name>:architecture", namespace: "project", upsert: true,
+  value: { style, layers, entryPoints, patterns, techDebt }
+})
+
+mcp__ruflo__memory_store({
+  key: "<project-name>:toolchain", namespace: "project", upsert: true,
+  value: { build, test, singleTest, lint, format, devServer, ci }
+})
+
+mcp__ruflo__memory_store({
+  key: "<project-name>:knowledge-graph", namespace: "project", upsert: true,
+  value: { entities: [...], edges: [...] }   // Agent E output
+})
+```
+
+**Serena memory (2 entries):**
+
+```
+mcp__serena__write_memory({
+  memory_name: "project/domain",
+  content: "# Domain\n\n{summary from Agent B}\n\n## Core concepts\n{concepts list}\n\n## Key flows\n{flows list}"
+})
+
+mcp__serena__write_memory({
+  memory_name: "project/architecture",
+  content: "# Architecture\n\n**Style:** {style}\n\n## Layers\n{layers}\n\n## Entry points\n{entry points}\n\n## Patterns\n{patterns}"
+})
+```
+
+Mark task 6 completed.
+
+---
+
+### Step 7 — Scaffold SDD structure if missing
+
+Read Agent D's report. Create only what's missing:
+
+- **Missing `docs/specs/`** → create `docs/specs/.gitkeep`
+- **Missing `docs/adr/`** → create `docs/adr/.gitkeep`
+- **Missing `docs/conventions.md`** → create with real stack (Agent C) and layer names (Agent A)
+- **Missing `docs/glossary.md`** → create with domain terms from Agent B's core concepts
+
+If everything exists, skip and note "SDD structure already in place".
+
+Mark task 7 completed.
+
+---
+
+### Step 8 — Done
+
+Print:
+```
+Onboarding complete.
+  CLAUDE.md ✓
+  docs/PROJECT.md ✓
+  docs/knowledge-graph.json — {N} entities, {M} edges
+  Ruflo memory — 4 entries stored
+  Serena memory — 2 entries stored
+  SDD — {N} files scaffolded
 ```
 
 ---
 
 ## What NOT to do
 
-- Do NOT ask setup questions before starting
-- Do NOT run steps sequentially when they can be parallelized
-- Do NOT generate multiple diagram files — exactly one Mermaid diagram, inline in PROJECT.md
+- Do NOT skip Step 0 — the one question shapes all agent analysis
+- Do NOT run agents sequentially — all 5 must fire in one message
+- Do NOT generate multiple diagram files — one Mermaid diagram, inline in PROJECT.md
 - Do NOT leave template placeholders in any output file
-- Do NOT block on Ruflo init or swarm init — if they fail, proceed with Claude native agents
-- Do NOT skip `memory_store` — every onboarding run must persist domain, architecture, and toolchain to Ruflo
-- Do NOT summarize what you just did at the end beyond the one-line completion message
+- Do NOT block on Ruflo or Serena init failures — always proceed
+- Do NOT skip `memory_store` or `write_memory` — every run must persist
+- Do NOT create a separate knowledge graph diagram file — `docs/knowledge-graph.json` only
 
 ---
 
 ## Fallback: no Ruflo MCP
 
-If `mcp__ruflo__swarm_init` is unavailable, send all four Agent tool calls as Claude native agents in a single message using `subagent_type: "Explore"` for agents A, C, D and `subagent_type: "general-purpose"` for agent B. The rest of the skill is identical.
+Use Claude native Agent tool with `subagent_type: "Explore"` for agents A, C, D, E and `subagent_type: "general-purpose"` for agent B. Skip Ruflo memory steps; write Serena memories only.
 
 ---
 
@@ -340,4 +388,4 @@ If `mcp__ruflo__swarm_init` is unavailable, send all four Agent tool calls as Cl
 |-----------|-------|
 | Add a feature with SDD discipline | `spec-driven-development` |
 | Deep parallel feature build | `multi-agent` |
-| Build and code review | `code-review` |
+| Code review | `code-review` |
