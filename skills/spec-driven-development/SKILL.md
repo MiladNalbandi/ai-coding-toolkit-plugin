@@ -18,10 +18,67 @@ description: >
 
 # Spec-Driven Development (SDD)
 
+> **Task:** $ARGUMENTS
+
 A process for shipping every meaningful change — from a one-line fix to a new
 feature — through the same loop, so that **intent, contract, validation, security,
 tests, and code never drift apart**. A year later, anyone reading the repo can answer
 *why* a line exists, not just *what* it does.
+
+---
+
+## Step 0 — Ask the user which steps to run
+
+Before running any step, ask the user **two questions** and wait for answers.
+
+### Question 1 — Which steps do you want to include?
+
+Present a checklist. Default = all checked. User can deselect by step number.
+
+```
+Pick which SDD steps to run for this task (default: all):
+
+  [x] 1. Spec — write docs/specs/NNN-feature.md with numbered ACs
+  [x] 2. Contract — update docs/api/openapi.yaml (HTTP features only)
+  [x] 3. Failing tests — red-first tests mapped to ACs
+  [x] 4. Validation + Security checklist
+  [x] 5. Implement — minimum code to make tests green
+  [x] 6. Refactor — formatter, linter, static analyzer, full test suite
+  [x] 7. Review + Smoke test — final correctness pass
+  [x] 8. ADR — record non-obvious decisions (skip if no decision worth recording)
+
+Reply with step numbers to SKIP (e.g. "skip 2, 8") or "all" to keep everything.
+```
+
+**Sensible skip combinations:**
+- Non-HTTP feature: skip 2 (Contract)
+- Trivial bug fix: skip 2, 8 (Contract + ADR)
+- Documentation-only change: skip 2, 3, 5 (Contract, Tests, Implement)
+- Bootstrapping SDD in a fresh repo: run all + scaffold templates first
+
+Store selected steps as `<active-steps>`. Skip any step not in this set.
+
+### Question 2 — Which lint/test tools should the Refactor step run?
+
+Detect what's available in the project, then present a checklist. Default = all detected, all checked.
+
+```
+For Step 6 (Refactor), which tools should I run? (detected from your project)
+
+  [x] Formatter:     {{e.g. pint / prettier / black / gofmt / rustfmt}}
+  [x] Auto-refactor: {{e.g. rector / ts-morph / autoflake — or "skip if N/A"}}
+  [x] Linter:        {{e.g. phpstan / eslint / ruff / golangci-lint / clippy}}
+  [x] Type checker:  {{e.g. mypy / tsc --noEmit / phpstan / cargo check}}
+  [x] Full test:     {{e.g. composer test / pytest / npm test / go test ./... / cargo test}}
+  [x] Smoke test:    {{e.g. curl health endpoint, app boot check}}
+
+Reply with tool names to SKIP, or "all" to run everything.
+You can also add tools I missed (e.g. "+ phpcs", "+ vitest run").
+```
+
+Store selected tools as `<active-tools>`. Step 6 runs only these in order.
+
+---
 
 > The system should say what it means, test what it promises, and implement only what
 > was agreed.
@@ -90,10 +147,23 @@ validation, authorization, business rules, data access, and output shaping into 
 dedicated layers.
 
 ### 6. Refactor — *clean up while green*
-Run the project's toolchain (formatter → automated refactorer → static analyzer → full
-test suite). Remove duplication, improve names, simplify flow, clarify boundaries, delete
-dead code. The public contract must not change here unless the spec and contract were
-updated first. Refactor only while the suite stays green.
+Run **only the tools the user selected in `<active-tools>` (Step 0, Question 2)** —
+in this order: formatter → auto-refactorer → linter → type checker → full test suite →
+smoke test. Show each command and its result with a checklist as you go:
+
+```
+Refactor pass (running <active-tools>):
+  ✔ pint           → 0 issues
+  ✔ rector         → 0 changes
+  ◼ phpstan        → 2 warnings (showing)
+  ⏳ composer test  → running
+  ⏳ smoke test     → pending
+```
+
+Remove duplication, improve names, simplify flow, clarify boundaries, delete dead code.
+The public contract must not change here unless the spec and contract were updated
+first. Refactor only while the suite stays green. **If a tool fails, stop and report —
+do not continue to the next tool.**
 
 ### 7. Review & Smoke — *green ≠ mergeable*
 Human review confirms the implementation matches the spec, the contract matches real
