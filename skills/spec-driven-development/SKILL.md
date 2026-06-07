@@ -27,44 +27,40 @@ description: >
 Before SDD-specific questions, ask the user **which overall flow** fits the task.
 This skill is most powerful when chained with sibling skills.
 
-```
-What flow do you want for `$ARGUMENTS`? (default: 4)
+**Use `AskUserQuestion` (single-select)** so the user gets a real picker:
 
-  1. Clarify only         — just produce numbered ACs (clarify-loop)
-                            Use when: you'll implement later or pass to someone else
-  2. Brainstorm → design  — superpowers:brainstorming → writing a design doc
-                            Use when: the idea is fuzzy and needs shape first
-  3. Quick build          — coding-workflows lightweight flow (no spec/contract)
-                            Use when: trivial change, no public contract or data impact
-  4. Full SDD             — spec → contract → red tests → implement → smoke
-                            Use when: data, auth, or API contract is touched
-  5. Full SDD + TDD       — full SDD + superpowers:test-driven-development discipline
-                            Use when: high-risk or regulatory work — strictest mode
-  6. Debug existing bug   — superpowers:systematic-debugging
-                            Use when: this is a bug, not a feature
-  7. Architecture only    — coding-workflows architecture flow + ADR
-                            Use when: you need a decision, not implementation
-
-Reply with the number, or "auto" to let me infer from the task.
+```json
+{
+  "question": "Which flow fits this task?",
+  "header": "Flow",
+  "multiSelect": false,
+  "options": [
+    { "label": "Clarify only", "description": "Just produce numbered ACs (clarify-loop). Use when you'll implement later or hand off." },
+    { "label": "Brainstorm → design", "description": "superpowers:brainstorming → writing-plans. Use when the idea is fuzzy and needs shape first." },
+    { "label": "Quick build (simple code flow)", "description": "coding-workflows lightweight flow — no spec/contract. Use for trivial changes with no contract or data impact." },
+    { "label": "Full SDD (Recommended)", "description": "spec → contract → red tests → implement → smoke. Use when data, auth, or API contract is touched." },
+    { "label": "Full SDD + TDD", "description": "SDD + superpowers:test-driven-development. Use for high-risk or regulatory work — strictest mode." },
+    { "label": "Debug existing bug", "description": "superpowers:systematic-debugging. Use when this is a bug, not a feature." },
+    { "label": "Architecture only", "description": "coding-workflows architecture flow + ADR. Use when you need a decision, not implementation." }
+  ]
+}
 ```
 
-Store as `<flow>`.
+Store the selected label as `<flow>`. If the user picks anything other than **Full SDD** or **Full SDD + TDD**, hand off to the corresponding skill and exit. Otherwise continue with Step 0 below.
 
-### Routing table
+### Routing table — every flow maps to specific skills
 
-| Choice | First skill | Then |
-|--------|-------------|------|
-| 1 | `clarify-loop` | stop |
-| 2 | `superpowers:brainstorming` | `superpowers:writing-plans` |
-| 3 | `coding-workflows` | `superpowers:verification-before-completion` |
-| 4 | `clarify-loop` (ACs) | continue with this SDD skill (Step 0 below) |
-| 5 | `clarify-loop` (ACs) | this SDD skill + `superpowers:test-driven-development` for tests |
-| 6 | `superpowers:systematic-debugging` | regression test in this codebase |
-| 7 | `coding-workflows` (Workflow 3) | write ADR via this skill (Step 8) |
+| Picked flow | First skill | Then | Final |
+|-------------|-------------|------|-------|
+| **Clarify only** | `ai-coding-toolkit:clarify-loop` | — | stop after ACs |
+| **Brainstorm → design** | `superpowers:brainstorming` | `superpowers:writing-plans` | hand to user |
+| **Quick build (simple code flow)** | `ai-coding-toolkit:clarify-loop` (sections 1, 2 only) | `ai-coding-toolkit:coding-workflows` (Workflow 1) | `superpowers:verification-before-completion` |
+| **Full SDD** | `ai-coding-toolkit:clarify-loop` (all sections) | this SDD skill (Step 0 → 8) | `superpowers:requesting-code-review` |
+| **Full SDD + TDD** | `ai-coding-toolkit:clarify-loop` | `superpowers:test-driven-development` for tests + this SDD skill for everything else | `superpowers:requesting-code-review` + `superpowers:verification-before-completion` |
+| **Debug existing bug** | `superpowers:systematic-debugging` | `ai-coding-toolkit:coding-workflows` (Workflow 2) for regression test | `superpowers:verification-before-completion` |
+| **Architecture only** | `ai-coding-toolkit:coding-workflows` (Workflow 3) | this SDD skill (Step 8 ADR only) | hand to user |
 
-If the user picks anything other than **4** or **5**, hand off and exit this skill.
-
-For **4** and **5**, continue with Step 0 below.
+If the user picks anything other than **Full SDD** or **Full SDD + TDD**, hand off and exit this skill.
 
 ---
 
@@ -81,21 +77,24 @@ Before running any step, ask the user **two questions** and wait for answers.
 
 ### Question 1 — Which steps do you want to include?
 
-Present a checklist. Default = all checked. User can deselect by step number.
+**Use the `AskUserQuestion` tool with `multiSelect: true`** so the user gets a real interactive checklist (not typed numbers).
 
-```
-Pick which SDD steps to run for this task (default: all):
-
-  [x] 1. Spec — write docs/specs/NNN-feature.md with numbered ACs
-  [x] 2. Contract — update docs/api/openapi.yaml (HTTP features only)
-  [x] 3. Failing tests — red-first tests mapped to ACs
-  [x] 4. Validation + Security checklist
-  [x] 5. Implement — minimum code to make tests green
-  [x] 6. Refactor — formatter, linter, static analyzer, full test suite
-  [x] 7. Review + Smoke test — final correctness pass
-  [x] 8. ADR — record non-obvious decisions (skip if no decision worth recording)
-
-Reply with step numbers to SKIP (e.g. "skip 2, 8") or "all" to keep everything.
+```json
+{
+  "question": "Which SDD steps should I run for this task?",
+  "header": "SDD steps",
+  "multiSelect": true,
+  "options": [
+    { "label": "1. Spec — docs/specs/NNN-feature.md with numbered ACs", "description": "The intent layer — frozen once a test references it." },
+    { "label": "2. Contract — update docs/api/openapi.yaml", "description": "HTTP features only. Skip for non-HTTP work." },
+    { "label": "3. Failing tests (red first)", "description": "Tests written before implementation, mapped to ACs." },
+    { "label": "4. Validation + Security checklist", "description": "Input rules, auth, ownership, data exposure — pin down before coding." },
+    { "label": "5. Implement — minimum code to make tests green", "description": "YAGNI. Sequential or parallel agents." },
+    { "label": "6. Refactor — formatter, linter, static analyzer, full test suite", "description": "Clean up while green. Tools chosen in Question 2." },
+    { "label": "7. Review + Smoke test", "description": "Human + AI review, generated smoke script, auto-fix loop on failures." },
+    { "label": "8. ADR — record non-obvious decisions", "description": "Skip if no decision worth recording." }
+  ]
+}
 ```
 
 **Sensible skip combinations:**
@@ -108,21 +107,25 @@ Store selected steps as `<active-steps>`. Skip any step not in this set.
 
 ### Question 2 — Which lint/test tools should the Refactor step run?
 
-Detect what's available in the project, then present a checklist. Default = all detected, all checked.
+**First detect** what's available in the project (scan package.json scripts, composer.json scripts, Cargo.toml, go.mod, Makefile, justfile). Then **use `AskUserQuestion` (multiSelect: true)** to present detected tools as a checklist:
 
+```json
+{
+  "question": "Which tools should run in Step 6 (Refactor)?",
+  "header": "Refactor tools",
+  "multiSelect": true,
+  "options": [
+    { "label": "Formatter — {{detected: prettier/pint/black/gofmt/…}}", "description": "Auto-format code. Fastest, never breaks anything." },
+    { "label": "Auto-refactor — {{detected: rector/ts-morph/autoflake/…}}", "description": "Apply mechanical refactors. Skip if N/A." },
+    { "label": "Linter — {{detected: eslint/phpstan/ruff/golangci-lint/clippy}}", "description": "Catch style + correctness issues." },
+    { "label": "Type checker — {{detected: tsc/mypy/phpstan/cargo check}}", "description": "Verify types. Slowest but most valuable." },
+    { "label": "Full test suite — {{detected: npm test/pytest/composer test/go test ./…}}", "description": "Run every test in the repo." },
+    { "label": "Smoke test — generated in Step 7", "description": "End-to-end check via curl against running app." }
+  ]
+}
 ```
-For Step 6 (Refactor), which tools should I run? (detected from your project)
 
-  [x] Formatter:     {{e.g. pint / prettier / black / gofmt / rustfmt}}
-  [x] Auto-refactor: {{e.g. rector / ts-morph / autoflake — or "skip if N/A"}}
-  [x] Linter:        {{e.g. phpstan / eslint / ruff / golangci-lint / clippy}}
-  [x] Type checker:  {{e.g. mypy / tsc --noEmit / phpstan / cargo check}}
-  [x] Full test:     {{e.g. composer test / pytest / npm test / go test ./... / cargo test}}
-  [x] Smoke test:    {{e.g. curl health endpoint, app boot check}}
-
-Reply with tool names to SKIP, or "all" to run everything.
-You can also add tools I missed (e.g. "+ phpcs", "+ vitest run").
-```
+Any tools the user wants to add (via "Other") get appended to `<active-tools>`.
 
 Store selected tools as `<active-tools>`. Step 6 runs only these in order.
 
