@@ -7,15 +7,11 @@
 ## Install
 
 ```bash
-# Claude Code
-claude-code plugin install https://github.com/{{your-username}}/ai-coding-toolkit
+# Step 1: Add the marketplace
+claude plugin marketplace add MiladNalbandi/claude-plugins
 
-# Or add manually to your claude.json
-{
-  "plugins": [
-    "https://github.com/{{your-username}}/ai-coding-toolkit"
-  ]
-}
+# Step 2: Install the plugin
+claude plugin install ai-coding-toolkit
 ```
 
 ---
