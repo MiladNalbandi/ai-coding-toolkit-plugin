@@ -68,6 +68,7 @@ Check:
 - Missing or misleading comments (especially on non-obvious decisions)
 - Duplication that should be extracted
 - Test coverage — what's unverifiable in its current form?
+- Unit tests present for the changed logic? Does coverage meet the budget (≥80% overall, 100% on critical paths)?
 - Is it over-engineered for the actual requirements?
 
 Give concrete rewrite suggestions, not just flags.

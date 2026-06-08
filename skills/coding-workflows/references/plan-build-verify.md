@@ -116,8 +116,11 @@ pyramid, AAA, hermetic isolation, factories, mocking discipline, coverage budget
 - **Contract** — if the change touches an API or interface
 - **e2e** — one happy path + one failure path (overlaps with Step 5 smoke)
 
-Each requirement gets a test at the **lowest layer that can express it**. Tests must be
-**green** before moving to smoke. No skipped tests committed without a tracked follow-up.
+Each requirement gets a test at the **lowest layer that can express it**, and **unit tests
+are mandatory** for the logic that was built. Tests must be **green** before moving to smoke.
+No skipped tests committed without a tracked follow-up. Then **run a coverage report** and
+confirm it meets the budget in [`testing-structure.md`](testing-structure.md) (≥80% overall,
+100% on critical paths).
 
 ---
 
@@ -180,6 +183,7 @@ Add a regression test in the unit/integration suite for **every** smoke failure 
     { "label": "Linter (eslint / ruff / phpstan / golangci-lint / clippy)", "description": "Style + correctness rules." },
     { "label": "Type checker (tsc / mypy / phpstan / cargo check)", "description": "Verify types." },
     { "label": "Full test suite", "description": "Run every test one more time before review." },
+    { "label": "Coverage report (meets budget)", "description": "Run coverage; confirm ≥80% overall and 100% on critical paths per testing-structure.md." },
     { "label": "Architecture rules (deptrac / archunit / dependency-cruiser)", "description": "Layering rules — handlers don't import DB driver, etc." }
   ]
 }

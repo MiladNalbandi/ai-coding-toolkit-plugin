@@ -151,6 +151,11 @@ hermetic isolation (no real time/randomness/network in unit+integration), factor
 test data. Follow the test style in {{existing test file}}.
 ```
 
+> **Unit tests are mandatory** for every unit of logic you added or changed. Once the suite
+> is green, **run a coverage report** and confirm it meets the budget in
+> [`testing-structure.md`](testing-structure.md) (≥80% overall, 100% on critical paths)
+> before moving on.
+
 ---
 
 ## Step 6 — Review pass

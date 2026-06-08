@@ -129,4 +129,6 @@ tests/
 - [ ] No real time / randomness / network in unit + integration
 - [ ] Factories exist for every entity created
 - [ ] Security-sensitive behavior (auth, authz, validation, data exposure) is tested
+- [ ] **Unit tests cover every changed unit of logic** — the base of the pyramid is never skipped
 - [ ] Full suite is green
+- [ ] **Coverage report run** and meets the budget (≥80% overall, 100% on critical paths) — a floor, not a target

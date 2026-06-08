@@ -95,6 +95,10 @@ Help me:
 1. Write the minimal fix — change only what is necessary
 2. Explain why this fixes the root cause (not just the symptom)
 3. Identify similar places in the codebase with the same bug pattern
-4. Write a test that would have caught this bug before it hit production
-5. Suggest a monitoring alert or log statement to detect future recurrence
+4. Write a **unit-level regression test** that would have caught this bug before production
+5. Confirm the fixed code path is covered — run a coverage check on the touched file(s)
+6. Suggest a monitoring alert or log statement to detect future recurrence
 ```
+
+> A fix is not done until it has a failing-then-passing regression test. See
+> [`testing-structure.md`](testing-structure.md) for the unit-test rules and coverage budget.

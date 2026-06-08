@@ -102,6 +102,7 @@ Rules:
 - Each phase must leave the system in a working state
 - Phase 1 should prove the riskiest assumption
 - Later phases build on validated foundations
+- Each phase ships with unit tests and meets the coverage budget (see `testing-structure.md`)
 
 For each phase: name, goal, what gets built, how to validate, size (S/M/L)
 ```
