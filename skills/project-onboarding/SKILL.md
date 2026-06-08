@@ -50,15 +50,14 @@ Ask the user exactly this, then wait for their answer before proceeding:
 >
 > **4. Full audit**
 > Covers everything: structure, domain, patterns, tech debt, and gaps. Best for a deep review or before a major refactor.
->
-> **5. Quick init**
-> Skips all analysis. Just initializes Ruflo + Serena, writes AGENTS.md (and optionally a CLAUDE.md that imports it) from the existing codebase, and stores the toolchain in MCP memory. Done in under a minute. Best when you just want the project wired up and ready for Claude to work in.
 
-Store their answer as `<onboarding-goal>`.
+Store their answer as `<onboarding-goal>` and use it to focus agent prompts in Step 3.
 
-**If user chose 5 (Quick init) → jump directly to the Quick Init fast path below. Skip steps 1–8.**
-
-Otherwise use it to focus agent prompts in Step 3.
+> **Just want a fast single-file pass?** This skill is the *deep* onboarding: parallel
+> agents, knowledge graph, MCP memory, SDD scaffolding. If you only want a quick
+> `CLAUDE.md`/`AGENTS.md` written from a single scan, use Claude Code's built-in **`/init`**
+> instead — it's faster and purpose-built for that. Come back to `/onboard` when you want
+> the full picture.
 
 ---
 
@@ -434,58 +433,9 @@ Onboarding complete.
   SDD — {N} files scaffolded
 ```
 
----
-
----
-
-## Quick Init fast path (option 5 only)
-
-Do ALL of the following in parallel in a **single message**:
-
-```
-mcp__ruflo__hooks_session-start({ sessionId: "<project-name>-onboarding" })
-mcp__ruflo__hooks_init({})
-mcp__ruflo__swarm_init({ topology: "mesh", maxAgents: 5 })
-mcp__serena__onboarding({})
-```
-
-Then spawn ONE agent to scan the toolchain and architecture:
-
-```
-Scan this codebase for its development toolchain and architecture style.
-Return:
-1. Build, test, single-test, lint, format, dev-server commands (exact strings or "not detected")
-2. Architectural style in one sentence
-3. The key layers (bullet list: layer → what it does)
-4. Entry points (routes, CLI, consumers, cron)
-```
-
-Use the agent's response to write **`AGENTS.md`** (same template as Step 4b §1), then run
-the same **`AskUserQuestion` about CLAUDE.md** (Step 4b §2) — write the thin
-`@AGENTS.md` wrapper only if the user says yes.
-
-Then store toolchain in Ruflo and Serena memory:
-
-```
-mcp__ruflo__memory_store({
-  key: "<project-name>:toolchain", namespace: "project", upsert: true,
-  value: { build, test, singleTest, lint, format, devServer }
-})
-
-mcp__serena__write_memory({
-  memory_name: "project/architecture",
-  content: "# Architecture\n\n{style}\n\n## Layers\n{layers}\n\n## Entry points\n{entry points}"
-})
-```
-
-Print when done:
-```
-Quick init complete.
-  AGENTS.md ✓
-  CLAUDE.md ✓ (if chosen — imports AGENTS.md)
-  Ruflo memory — 1 entry stored
-  Serena memory — 1 entry stored
-```
+> **Want a faster, single-file pass instead?** Use Claude Code's built-in **`/init`**.
+> `/onboard` is intentionally the deep path — parallel agents, knowledge graph, MCP
+> memory, and SDD scaffolding.
 
 ---
 
