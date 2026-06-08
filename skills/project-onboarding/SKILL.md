@@ -3,7 +3,8 @@ name: project-onboarding
 description: >
   Parallel codebase onboarding with one focused question upfront. Spawns 5 agents
   simultaneously via Ruflo swarm (or Claude native Agents as fallback), builds a
-  knowledge graph, writes CLAUDE.md + docs/PROJECT.md, generates Mermaid diagrams,
+  knowledge graph, writes a portable AGENTS.md (+ optional CLAUDE.md that imports it)
+  and docs/PROJECT.md, generates Mermaid diagrams,
   detects toolchain (lint/CI/build), persists findings to Ruflo memory, and onboards
   Serena. Trigger on "onboard this project", "init project", "start a new project",
   "analyze this codebase", "what does this project do", "bootstrap sdd", "scaffold docs".
@@ -12,7 +13,7 @@ command: /onboard
 
 # Project Onboarding
 
-> Parallel codebase onboarding with one focused question upfront. Spawns 5 agents simultaneously, builds a knowledge graph, writes CLAUDE.md + docs/PROJECT.md, persists findings to Ruflo memory, and onboards Serena.
+> Parallel codebase onboarding with one focused question upfront. Spawns 5 agents simultaneously, builds a knowledge graph, writes a portable AGENTS.md (+ an optional CLAUDE.md that imports it) and docs/PROJECT.md, persists findings to Ruflo memory, and onboards Serena.
 
 ## Trigger phrases
 
@@ -51,7 +52,7 @@ Ask the user exactly this, then wait for their answer before proceeding:
 > Covers everything: structure, domain, patterns, tech debt, and gaps. Best for a deep review or before a major refactor.
 >
 > **5. Quick init**
-> Skips all analysis. Just initializes Ruflo + Serena, writes CLAUDE.md from the existing codebase, and stores the toolchain in MCP memory. Done in under a minute. Best when you just want the project wired up and ready for Claude to work in.
+> Skips all analysis. Just initializes Ruflo + Serena, writes AGENTS.md (and optionally a CLAUDE.md that imports it) from the existing codebase, and stores the toolchain in MCP memory. Done in under a minute. Best when you just want the project wired up and ready for Claude to work in.
 
 Store their answer as `<onboarding-goal>`.
 
@@ -70,7 +71,7 @@ Create these tasks via `TaskCreate`:
 | 1 | Init Ruflo and Serena | Initializing |
 | 2 | Run 5 parallel analysis agents | Analyzing codebase |
 | 3 | Write docs/PROJECT.md | Writing PROJECT.md |
-| 4 | Write CLAUDE.md | Writing CLAUDE.md |
+| 4 | Write AGENTS.md (+ optional CLAUDE.md) | Writing AGENTS.md |
 | 5 | Build knowledge graph | Building knowledge graph |
 | 6 | Persist to Ruflo and Serena memory | Persisting to memory |
 | 7 | Scaffold SDD structure | Scaffolding SDD |
@@ -150,7 +151,7 @@ Check this codebase for spec-driven development scaffolding. Return a structured
 3. Does docs/api/ or openapi.yaml exist?
 4. Does docs/conventions.md exist?
 5. Does docs/glossary.md exist?
-6. Is there ARCHITECTURE.md, README.md, or CLAUDE.md? Summarize key points.
+6. Is there ARCHITECTURE.md, README.md, AGENTS.md, or CLAUDE.md? Summarize key points.
 
 Return only the report. No preamble.
 ```
@@ -257,15 +258,21 @@ Mark task 3 completed.
 
 ---
 
-### Step 4b — Write CLAUDE.md
+### Step 4b — Write AGENTS.md (portable facts), then optionally CLAUDE.md
 
-If `CLAUDE.md` already exists, add missing sections only — do not overwrite existing content.
+Write the **portable, tool-neutral project facts to `AGENTS.md`** — these are read by any
+agent (Claude Code, Cursor, Codex, …). Then offer a thin Claude-specific `CLAUDE.md` that
+imports it, so there is **one source of truth and no drift**.
+
+#### 1. Always write `AGENTS.md`
+
+If `AGENTS.md` already exists, add missing sections only — do not overwrite existing content.
 If it does not exist, create it:
 
 ```markdown
-# CLAUDE.md
+# AGENTS.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Guidance for AI coding agents working in this repository.
 
 ## Commands
 
@@ -294,7 +301,44 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Rules:
 - Real command strings only — omit any row where tool was "not detected"
+- Keep tool-neutral — no Claude-only or MCP-specific content here
 - Keep under 60 lines
+
+#### 2. Ask whether to also create `CLAUDE.md`
+
+**Use `AskUserQuestion` (single-select):**
+
+```json
+{
+  "question": "AGENTS.md written. Also create a CLAUDE.md that imports it (recommended if you use Claude Code)?",
+  "header": "CLAUDE.md",
+  "multiSelect": false,
+  "options": [
+    { "label": "✅ Yes — thin CLAUDE.md that imports AGENTS.md", "description": "CLAUDE.md = @AGENTS.md + a small Claude-only section (skills, MCP servers). One source of truth, no duplication." },
+    { "label": "Skip — AGENTS.md only", "description": "Rely on Claude Code reading AGENTS.md directly. No wrapper file." }
+  ]
+}
+```
+
+If **Yes** — write `CLAUDE.md` as a thin wrapper. If `CLAUDE.md` already exists, add the
+import + missing Claude-only lines only; never duplicate the facts already in `AGENTS.md`:
+
+```markdown
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working in this repository.
+
+@AGENTS.md
+
+## Claude Code notes
+
+**Skills to use:** {e.g. /spec-driven-development for features, /clarify before any task, /workflow for debugging}
+**MCP servers:** {e.g. Ruflo (memory + swarm), Serena (symbols) — if detected/onboarded}
+**Gotchas:** {Claude-specific pitfalls, if any}
+```
+
+> `@AGENTS.md` is a Claude Code import — other tools read `AGENTS.md` directly and ignore
+> this wrapper. So keep every universal fact in `AGENTS.md`; put only Claude-only lines here.
 
 Mark task 4 completed.
 
@@ -381,7 +425,8 @@ Mark task 7 completed.
 Print:
 ```
 Onboarding complete.
-  CLAUDE.md ✓
+  AGENTS.md ✓
+  CLAUDE.md ✓ (if chosen — imports AGENTS.md)
   docs/PROJECT.md ✓
   docs/knowledge-graph.json — {N} entities, {M} edges
   Ruflo memory — 4 entries stored
@@ -404,7 +449,7 @@ mcp__ruflo__swarm_init({ topology: "mesh", maxAgents: 5 })
 mcp__serena__onboarding({})
 ```
 
-Then spawn ONE agent to scan the toolchain and write CLAUDE.md:
+Then spawn ONE agent to scan the toolchain and architecture:
 
 ```
 Scan this codebase for its development toolchain and architecture style.
@@ -415,7 +460,9 @@ Return:
 4. Entry points (routes, CLI, consumers, cron)
 ```
 
-Use the agent's response to write CLAUDE.md (same template as Step 4b).
+Use the agent's response to write **`AGENTS.md`** (same template as Step 4b §1), then run
+the same **`AskUserQuestion` about CLAUDE.md** (Step 4b §2) — write the thin
+`@AGENTS.md` wrapper only if the user says yes.
 
 Then store toolchain in Ruflo and Serena memory:
 
@@ -434,7 +481,8 @@ mcp__serena__write_memory({
 Print when done:
 ```
 Quick init complete.
-  CLAUDE.md ✓
+  AGENTS.md ✓
+  CLAUDE.md ✓ (if chosen — imports AGENTS.md)
   Ruflo memory — 1 entry stored
   Serena memory — 1 entry stored
 ```

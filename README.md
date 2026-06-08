@@ -109,7 +109,7 @@ ai-coding-toolkit/
 │   ├── multi-agent/
 │   │   └── SKILL.md              # Fan-out patterns: mesh / star / pipeline
 │   ├── project-onboarding/
-│   │   ├── SKILL.md              # 5 parallel agents → CLAUDE.md + docs + graph
+│   │   ├── SKILL.md              # 5 parallel agents → AGENTS.md (+CLAUDE.md) + docs + graph
 │   │   └── project.md
 │   ├── prompt-library/
 │   │   └── SKILL.md              # 12+ ready-to-use prompt templates
