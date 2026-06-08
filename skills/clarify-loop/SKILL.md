@@ -246,7 +246,7 @@ Before ANY coding task, ask yourself these five questions. If you can't answer t
 A change is mergeable only when **all** of these hold:
 
 - [ ] Requirements captured as **numbered acceptance criteria** (AC-001, AC-002, …), each observable and testable.
-- [ ] Tests exist, map back to ACs by name, and **failed before** implementation (red-first).
+- [ ] Tests exist, map back to ACs by name, and **failed before** implementation (red-first). *(For the SDD test-after flow — coding-workflows Workflow 6 — this becomes: tests pass, written immediately after implementation.)*
 - [ ] Input validation is explicit and tested.
 - [ ] Authentication, authorization, and **ownership** rules are explicit and tested.
 - [ ] Sensitive/internal fields are not exposed; error responses are intentional.

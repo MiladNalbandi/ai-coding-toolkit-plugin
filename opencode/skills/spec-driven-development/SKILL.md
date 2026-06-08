@@ -35,9 +35,10 @@ Ask the user this question and wait for their reply: **"Which flow fits this tas
 3. **Quick build (simple code flow)** — coding-workflows lightweight flow — no spec/contract. Use for trivial changes with no contract or data impact.
 4. **Plan → Build → Verify (PBV)** — coding-workflows Workflow 5: plan + human approval → small tasks → multi-agent build → tests → smoke/e2e → lint → human review. Use when the change deserves a plan but not a frozen spec.
 5. **Full SDD (Recommended)** — spec → contract → red tests → implement → smoke. Use when data, auth, or API contract is touched.
-6. **Full SDD + TDD** — SDD + a strict red-first TDD loop. Use for high-risk or regulatory work — strictest mode.
-7. **Debug existing bug** — systematic debugging method. Use when this is a bug, not a feature.
-8. **Architecture only** — coding-workflows architecture flow + ADR. Use when you need a decision, not implementation.
+6. **Full SDD — tests after (no TDD)** — coding-workflows Workflow 6: same SDD rigor (spec, contract, ACs, validation, DoD) but tests are written AFTER implementation and must pass — not red-first. Use when you want SDD discipline without test-first.
+7. **Full SDD + TDD** — SDD + a strict red-first TDD loop. Use for high-risk or regulatory work — strictest mode.
+8. **Debug existing bug** — systematic debugging method. Use when this is a bug, not a feature.
+9. **Architecture only** — coding-workflows architecture flow + ADR. Use when you need a decision, not implementation.
 
 Store the selected label as `<flow>`. If the user picks anything other than **Full SDD** or **Full SDD + TDD**, hand off to the corresponding skill and exit. Otherwise continue with Step 0 below.
 
@@ -50,6 +51,7 @@ Store the selected label as `<flow>`. If the user picks anything other than **Fu
 | **Quick build (simple code flow)** | `ai-coding-toolkit:clarify-loop` (sections 1, 2 only) | `ai-coding-toolkit:coding-workflows` (Workflow 1) | a verification-before-completion checklist |
 | **Plan → Build → Verify (PBV)** | `ai-coding-toolkit:clarify-loop` (sections 1, 2) | `ai-coding-toolkit:coding-workflows` (Workflow 5) + `ai-coding-toolkit:multi-agent` | verification-before-completion checklist + an adversarial AI code review |
 | **Full SDD** | `ai-coding-toolkit:clarify-loop` (all sections) | this SDD skill (Step 0 → 8) | an adversarial AI code review |
+| **Full SDD — tests after (no TDD)** | `ai-coding-toolkit:clarify-loop` (all sections) | `ai-coding-toolkit:coding-workflows` (Workflow 6) — runs SDD steps in test-after order | an adversarial AI code review |
 | **Full SDD + TDD** | `ai-coding-toolkit:clarify-loop` | a strict red-first TDD loop for tests + this SDD skill for everything else | an adversarial AI code review + verification-before-completion checklist |
 | **Debug existing bug** | systematic debugging method | `ai-coding-toolkit:coding-workflows` (Workflow 2) for regression test | verification-before-completion checklist |
 | **Architecture only** | `ai-coding-toolkit:coding-workflows` (Workflow 3) | this SDD skill (Step 8 ADR only) | hand to user |

@@ -30,6 +30,7 @@ This file is an index. Each workflow lives in its own reference file under `refe
 | **3. Architecture** | An (often irreversible) design decision between options | [`references/architecture.md`](references/architecture.md) |
 | **4. Code Review** | Reviewing a diff across correctness / security / perf / maintainability | [`references/code-review.md`](references/code-review.md) |
 | **5. Plan → Build → Verify (PBV)** | A multi-file change that deserves a plan, multi-agent build, and human gates | [`references/plan-build-verify.md`](references/plan-build-verify.md) |
+| **6. Spec-Driven, Test-After** | You want full SDD rigor (spec, contract, ACs, DoD) but write tests *after* building, not test-first | [`references/spec-driven-test-after.md`](references/spec-driven-test-after.md) |
 
 ### Shared structures (used by the implement + test steps)
 
@@ -44,6 +45,7 @@ output is consistent across every task:
 - **Requirements still fuzzy?** → run the `clarify-loop` skill first, then come back.
 - **Change has acceptance criteria worth numbering, or touches validation / authorization / an API contract?** → use `spec-driven-development` instead of Workflow 1.
 - **Multi-file change with review checkpoints but no frozen spec?** → Workflow 5 (PBV).
+- **Want full SDD rigor (spec/contract/ACs/DoD) but your team writes tests _after_ building, not test-first?** → Workflow 6 (Spec-Driven, Test-After).
 - **Just a bug?** → Workflow 2, or run a systematic debugging loop for a deeper investigation.
 
 ---

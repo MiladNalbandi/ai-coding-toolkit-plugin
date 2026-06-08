@@ -1,6 +1,6 @@
 {
   "name": "ai-coding-toolkit",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "description": "Structured workflows, clarify-first loops, prompt library, MCP setup, spec-driven development, project onboarding, and multi-agent orchestration for fast AI-assisted feature work and debugging.",
   "author": {
     "name": "Milad Nalbandi Rezaei",
