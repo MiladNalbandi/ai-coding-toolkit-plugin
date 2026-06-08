@@ -11,8 +11,13 @@
 claude plugin marketplace add MiladNalbandi/claude-plugins
 
 # Step 2: Install the plugin
-claude plugin install ai-coding-toolkit
+claude plugin install ai-coding-toolkit@milad-plugins
 ```
+
+> **Using [opencode](https://opencode.ai) instead of (or as well as) Claude Code?**
+> The same 7 skills are ported to opencode under [`opencode/`](opencode/) — opencode reads
+> Claude-compatible `SKILL.md` natively, so it's a real port with opencode-native tool
+> wiring. See [`opencode/README.md`](opencode/README.md) for install + the tool-mapping table.
 
 ---
 
