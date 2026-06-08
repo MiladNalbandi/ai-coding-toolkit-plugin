@@ -64,6 +64,10 @@ Wait for my approval before writing any implementation code.
 
 ## Step 4 — Implement incrementally
 
+**Follow the coding structure** in [`references/coding-structure.md`](coding-structure.md):
+build bottom-up in the layer order (schema → model → factory → authz → use-case →
+validator → serializer → handler → route), keep entry points thin, and honor YAGNI.
+
 First, ask the user:
 
 ```
@@ -75,7 +79,7 @@ How do you want to implement this? (default: 2)
 
 ### Sequential (mode 1)
 
-One logical chunk at a time. Each chunk must be runnable.
+One logical chunk at a time, in the layer order above. Each chunk must be runnable.
 
 ```
 Implement step {{N}} of the plan: {{step description}}.
@@ -121,19 +125,30 @@ See the `multi-agent` skill for topology and fallback detail.
 
 ## Step 5 — Write tests
 
-Cover happy path + edge cases discovered during design.
+**Follow the testing structure** in [`references/testing-structure.md`](testing-structure.md):
+work the pyramid (≈70% unit / 25% integration / 5% e2e), AAA shape, hermetic isolation,
+factories over fixtures, disciplined mocking. Write tests at the **lowest layer** that can
+express each check.
+
+Cover, at the right layer:
+- **Unit** — pure logic: validators, mappers, serializers, calculators, business rules
+- **Integration** — the use-case end to end against a **real DB** (transaction rolled back per test)
+- **Contract** — if the change touches an API/interface, assert the response shape
+- **e2e / smoke** — one happy path + one failure path against the booted app
 
 ```
-Write tests for {{class/function}} using {{PHPUnit/pytest/jest}}.
+Write tests for {{feature}} using {{jest/pytest/pest/go test/cargo test}}, following
+references/testing-structure.md.
 
-Cover:
-1. Happy path — normal successful execution
-2. Edge cases: {{list the ones you know}}
-3. Error cases: invalid input, external service failure, concurrent access
-4. Any invariants that must always hold
+Layers to produce:
+1. Unit — happy path + edge cases ({{list}}) + error cases (invalid input, failure)
+2. Integration — use-case + real DB with rollback; assert persisted state
+3. (if API) Contract — response matches the agreed shape
+4. e2e — one happy path, one failure path
 
-Follow the test style in {{existing test file}}.
-Each test: independent, descriptive name, one assertion per concept.
+Rules: AAA blocks, one act + one assertion concept per test, no conditionals/loops,
+hermetic isolation (no real time/randomness/network in unit+integration), factories for
+test data. Follow the test style in {{existing test file}}.
 ```
 
 ---

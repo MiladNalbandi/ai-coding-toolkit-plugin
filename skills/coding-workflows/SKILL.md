@@ -31,6 +31,14 @@ This file is an index. Each workflow lives in its own reference file under `refe
 | **4. Code Review** | Reviewing a diff across correctness / security / perf / maintainability | [`references/code-review.md`](references/code-review.md) |
 | **5. Plan → Build → Verify (PBV)** | A multi-file change that deserves a plan, multi-agent build, and human gates | [`references/plan-build-verify.md`](references/plan-build-verify.md) |
 
+### Shared structures (used by the implement + test steps)
+
+Any workflow that **writes code** or **writes tests** follows these two references so the
+output is consistent across every task:
+
+- **Coding structure** — [`references/coding-structure.md`](references/coding-structure.md): the layer order (schema → model → factory → authz → use-case → validator → serializer → handler → route), placement rules, thin entry points, YAGNI.
+- **Testing structure** — [`references/testing-structure.md`](references/testing-structure.md): the pyramid (unit / integration / contract / e2e), AAA, hermetic isolation, factories, mocking discipline, coverage budgets, layout.
+
 ### Routing rules
 
 - **Requirements still fuzzy?** → run the `clarify-loop` skill first, then come back.

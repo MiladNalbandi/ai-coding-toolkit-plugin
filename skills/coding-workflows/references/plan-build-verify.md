@@ -68,6 +68,9 @@ This gives the user live progress visibility and prevents silent reordering.
 }
 ```
 
+Either mode follows the **coding structure** in [`coding-structure.md`](coding-structure.md)
+— layer order (schema → … → route), thin entry points, YAGNI.
+
 ### Parallel mode
 
 Use the **multi-agent skill** to fan out:
@@ -78,7 +81,7 @@ Use the **multi-agent skill** to fan out:
 
 ### Sequential mode
 
-Run tasks in dependency order. After each task: run only the relevant tests, then move on.
+Run tasks in dependency (layer) order. After each task: run only the relevant tests, then move on.
 
 ---
 
@@ -106,12 +109,15 @@ Do not proceed to Step 4 until **Approve**.
 
 ## Step 4 — Write tests for what was built
 
-Per Step 3 of SDD (test pyramid, AAA, isolation, factories, mocking). Cover:
-- **Unit** — pure logic (validators, mappers, calculators)
-- **Integration** — multi-layer wiring with real DB rollback per test
+**Follow the testing structure** in [`testing-structure.md`](testing-structure.md) — the
+pyramid, AAA, hermetic isolation, factories, mocking discipline, coverage budgets. Cover:
+- **Unit** — pure logic (validators, mappers, serializers, calculators)
+- **Integration** — multi-layer wiring with a real DB, transaction rolled back per test
 - **Contract** — if the change touches an API or interface
+- **e2e** — one happy path + one failure path (overlaps with Step 5 smoke)
 
-Tests must be **green** before moving to smoke. No skipped tests committed without a tracked follow-up.
+Each requirement gets a test at the **lowest layer that can express it**. Tests must be
+**green** before moving to smoke. No skipped tests committed without a tracked follow-up.
 
 ---
 
