@@ -93,20 +93,29 @@ This toolkit is **complementary to Superpowers**, not a replacement:
 ```
 ai-coding-toolkit/
 ├── .claude-plugin/
-│   └── metadata.json
+│   └── plugin.json              # Plugin manifest (name, version, license, keywords)
 ├── skills/
 │   ├── spec-driven-development/  # The rigorous feature-building backbone
 │   │   ├── SKILL.md              #   spec → contract → red tests → DoD loop
 │   │   ├── assets/               #   spec, ADR, conventions, glossary, openapi templates
 │   │   └── references/           #   workflow, stack-mapping, database, frontend
-│   ├── coding-workflows/
-│   │   └── SKILL.md              # Feature, Debug, Architecture, Review flows
+│   ├── coding-workflows/         # Index of 5 workflows; each in its own reference
+│   │   ├── SKILL.md              #   router + key principles
+│   │   └── references/           #   feature-development, debugging, architecture,
+│   │                             #   code-review, plan-build-verify
 │   ├── clarify-loop/
-│   │   └── SKILL.md              # 6 task types → numbered ACs + Definition of Done
+│   │   ├── SKILL.md              #   orchestration: task type, sections, AC review
+│   │   └── references/           #   task-types (6 question blocks + prompt templates)
+│   ├── multi-agent/
+│   │   └── SKILL.md              # Fan-out patterns: mesh / star / pipeline
+│   ├── project-onboarding/
+│   │   ├── SKILL.md              # 5 parallel agents → CLAUDE.md + docs + graph
+│   │   └── project.md
 │   ├── prompt-library/
 │   │   └── SKILL.md              # 12+ ready-to-use prompt templates
 │   └── mcp-toolkit/
 │       └── SKILL.md              # Filesystem, Browser, GitHub, Database setup
+├── LICENSE                      # MIT
 └── README.md
 ```
 
