@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="680" viewBox="0 0 1100 680" font-family="ui-sans-serif, system-ui, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <rect width="1100" height="680" fill="#f4f7fb"/>
+  <text x="56" y="58" font-size="28" font-weight="600" fill="#131b26">Every schema change opens with the diff</text>
+  <text x="56" y="86" font-size="16" fill="#41536b">Before, after, and what it costs — drawn before a single migration file is written.</text>
+
+  <defs>
+    <marker id="ar" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0 0 L10 5 L0 10 z" fill="#1f5f9e"/>
+    </marker>
+  </defs>
+
+  <text x="56" y="128" font-size="12.5" fill="#6d809a" font-family="ui-monospace, Menlo, monospace" letter-spacing="1.4">BEFORE</text>
+  <rect x="56" y="140" width="330" height="196" rx="4" fill="#ffffff" stroke="#c3d1e3"/>
+  <rect x="56" y="140" width="330" height="38" rx="4" fill="#eef2f8"/>
+  <rect x="56" y="168" width="330" height="10" fill="#eef2f8"/>
+  <text x="76" y="165" font-size="15" font-weight="600" fill="#131b26" font-family="ui-monospace, Menlo, monospace">posts</text>
+  <g font-size="14" fill="#41536b" font-family="ui-monospace, Menlo, monospace">
+    <text x="76" y="206">id           bigint PK</text>
+    <text x="76" y="234">title        varchar(255)</text>
+    <text x="76" y="262">body         text</text>
+    <text x="76" y="290">created_at   timestamptz</text>
+    <text x="76" y="318">legacy_slug  varchar(64)</text>
+  </g>
+
+  <path d="M400 238 L452 238" stroke="#1f5f9e" stroke-width="2.5" marker-end="url(#ar)"/>
+
+  <text x="470" y="128" font-size="12.5" fill="#6d809a" font-family="ui-monospace, Menlo, monospace" letter-spacing="1.4">AFTER</text>
+  <rect x="470" y="140" width="380" height="196" rx="4" fill="#ffffff" stroke="#c3d1e3"/>
+  <rect x="470" y="140" width="380" height="38" rx="4" fill="#eef2f8"/>
+  <rect x="470" y="168" width="380" height="10" fill="#eef2f8"/>
+  <text x="490" y="165" font-size="15" font-weight="600" fill="#131b26" font-family="ui-monospace, Menlo, monospace">posts</text>
+  <g font-size="14" font-family="ui-monospace, Menlo, monospace">
+    <text x="490" y="206" fill="#8a99ad">id           bigint PK</text>
+    <text x="490" y="234" fill="#8a99ad">body         text</text>
+    <text x="490" y="262" fill="#1f6b4f">+ author_id    bigint NULL</text>
+    <text x="490" y="290" fill="#1f6b4f">+ published_at timestamptz</text>
+    <text x="490" y="318" fill="#96591a">~ title        varchar→text</text>
+  </g>
+  <text x="870" y="266" font-size="13" fill="#1f6b4f">new, nullable</text>
+  <text x="870" y="294" font-size="13" fill="#1f6b4f">new</text>
+  <text x="870" y="322" font-size="13" fill="#96591a">widened</text>
+  <text x="490" y="358" font-size="14" fill="#9a3436" font-family="ui-monospace, Menlo, monospace">- legacy_slug</text>
+  <text x="640" y="358" font-size="13" fill="#9a3436">dropped in M4, one release later</text>
+
+  <rect x="56" y="392" width="988" height="128" rx="4" fill="#eef2f8" stroke="#d6dfeb"/>
+  <g font-size="14" fill="#41536b" font-family="ui-monospace, Menlo, monospace">
+    <text x="78" y="422">fks:     + author_id → users.id  (NOT VALID, validated in M3)</text>
+    <text x="78" y="450">indexes: + posts_author_id_idx    (btree, author_id)</text>
+    <text x="78" y="474">         + posts_published_idx    (btree, published_at) WHERE NOT NULL</text>
+    <text x="78" y="502" fill="#131b26">rows: ~2.4M   ·   est. lock: none — every step is online</text>
+  </g>
+</svg>

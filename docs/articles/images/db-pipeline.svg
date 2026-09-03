@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="760" viewBox="0 0 1100 760" font-family="ui-sans-serif, system-ui, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <rect width="1100" height="760" fill="#f4f7fb"/>
+  <text x="56" y="58" font-size="28" font-weight="600" fill="#131b26">A schema change gets its own pipeline</text>
+  <text x="56" y="86" font-size="16" fill="#41536b">Nine steps, two gates, and a rollback rehearsal before anything reaches a real database.</text>
+
+  <g font-family="ui-monospace, Menlo, monospace">
+    <line x1="104" y1="128" x2="104" y2="586" stroke="#c3d1e3" stroke-width="2"/>
+    <g font-size="14">
+      <!-- rows: y, id, title, detail, accent -->
+      <g><circle cx="104" cy="140" r="7" fill="#1f5f9e"/><text x="136" y="136" font-size="15" font-weight="600" fill="#131b26">D0  detect</text><text x="136" y="158" font-size="14" fill="#41536b" font-family="ui-sans-serif, system-ui, sans-serif">engine, migration tool, existing schema, real row counts</text></g>
+      <g><circle cx="104" cy="196" r="7" fill="#1f5f9e"/><text x="136" y="192" font-size="15" font-weight="600" fill="#131b26">D1  inventory</text><text x="136" y="214" font-size="14" fill="#41536b" font-family="ui-sans-serif, system-ui, sans-serif">render the before/after diff → <tspan fill="#1f5f9e" font-weight="600">GATE: is this the schema you meant?</tspan></text></g>
+      <g><circle cx="104" cy="252" r="7" fill="#1f5f9e"/><text x="136" y="248" font-size="15" font-weight="600" fill="#131b26">D2  classify</text><text x="136" y="270" font-size="14" fill="#41536b" font-family="ui-sans-serif, system-ui, sans-serif">additive / tightening / data-moving / destructive × row count</text></g>
+      <g><circle cx="104" cy="308" r="7" fill="#1f5f9e"/><text x="136" y="304" font-size="15" font-weight="600" fill="#131b26">D3  plan</text><text x="136" y="326" font-size="14" fill="#41536b" font-family="ui-sans-serif, system-ui, sans-serif">expand → backfill → enforce → contract, one migration per deploy</text></g>
+      <g><circle cx="104" cy="364" r="7" fill="#96591a"/><text x="136" y="360" font-size="15" font-weight="600" fill="#131b26">D4  safety</text><text x="136" y="382" font-size="14" fill="#41536b" font-family="ui-sans-serif, system-ui, sans-serif"><tspan fill="#96591a" font-weight="600">GATE:</tspan> reversible · online index · batched backfill · timeouts · backup</text></g>
+      <g><circle cx="104" cy="420" r="7" fill="#1f5f9e"/><text x="136" y="416" font-size="15" font-weight="600" fill="#131b26">D5  generate</text><text x="136" y="438" font-size="14" fill="#41536b" font-family="ui-sans-serif, system-ui, sans-serif">one migration per step, each with a real down()</text></g>
+      <g><circle cx="104" cy="476" r="7" fill="#1f6b4f"/><text x="136" y="472" font-size="15" font-weight="600" fill="#131b26">D6  verify</text><text x="136" y="494" font-size="14" fill="#41536b" font-family="ui-sans-serif, system-ui, sans-serif">up → down → up on a scratch DB · constraints reject bad rows · EXPLAIN</text></g>
+      <g><circle cx="104" cy="532" r="7" fill="#1f5f9e"/><text x="136" y="528" font-size="15" font-weight="600" fill="#131b26">D7  ADR</text><text x="136" y="550" font-size="14" fill="#41536b" font-family="ui-sans-serif, system-ui, sans-serif">column type, index type, denormalization, partitioning</text></g>
+      <g><circle cx="104" cy="586" r="7" fill="#1f5f9e"/><text x="136" y="582" font-size="15" font-weight="600" fill="#131b26">D8  handoff</text><text x="136" y="604" font-size="14" fill="#41536b" font-family="ui-sans-serif, system-ui, sans-serif">back to the AC loop with the tests and the diagram</text></g>
+    </g>
+  </g>
+</svg>

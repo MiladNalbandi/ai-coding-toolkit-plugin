@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="820" viewBox="0 0 1100 820" font-family="ui-sans-serif, system-ui, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <rect width="1100" height="820" fill="#f4f7fb"/>
+  <text x="56" y="60" font-size="28" font-weight="600" fill="#131b26">The gate — seven ways to answer</text>
+  <text x="56" y="88" font-size="16" fill="#41536b">Everything except the three exits comes back to the same question, so you can chain them.</text>
+
+  <rect x="56" y="112" width="988" height="52" rx="3" fill="#e7edf6" stroke="#c3d1e3"/>
+  <text x="76" y="144" font-size="15" fill="#131b26" font-family="ui-monospace, Menlo, monospace">AC-003 is green (2/9 done). Test: test(AC-003) · Impl: feat(AC-003). What next?</text>
+
+  <g font-size="15.5">
+    <!-- rows -->
+    <g>
+      <rect x="56" y="180" width="988" height="66" rx="3" fill="#ffffff" stroke="#d6dfeb"/>
+      <text x="80" y="211" font-size="19">✅</text>
+      <text x="116" y="207" font-weight="600" fill="#131b26">Approve — next AC</text>
+      <text x="116" y="230" font-size="14" fill="#41536b">AC-003 is done. Move to AC-004.</text>
+      <text x="1020" y="216" font-size="12" fill="#6d809a" text-anchor="end" font-family="ui-monospace, Menlo, monospace">EXIT</text>
+    </g>
+    <g>
+      <rect x="56" y="252" width="988" height="66" rx="3" fill="#ffffff" stroke="#d6dfeb"/>
+      <text x="80" y="283" font-size="19">👤</text>
+      <text x="116" y="279" font-weight="600" fill="#131b26">Human review — show me the diff</text>
+      <text x="116" y="302" font-size="14" fill="#41536b">This AC's two commits only. Approve, request changes, or reject.</text>
+      <text x="1020" y="288" font-size="12" fill="#1f5f9e" text-anchor="end" font-family="ui-monospace, Menlo, monospace">↩ BACK TO GATE</text>
+    </g>
+    <g>
+      <rect x="56" y="324" width="988" height="66" rx="3" fill="#ffffff" stroke="#d6dfeb"/>
+      <text x="80" y="355" font-size="19">🤖</text>
+      <text x="116" y="351" font-weight="600" fill="#131b26">AI review this AC</text>
+      <text x="116" y="374" font-size="14" fill="#41536b">Adversarial review of this diff only. Each finding: Apply / Defer / Reject.</text>
+      <text x="1020" y="360" font-size="12" fill="#1f5f9e" text-anchor="end" font-family="ui-monospace, Menlo, monospace">↩ BACK TO GATE</text>
+    </g>
+    <g>
+      <rect x="56" y="396" width="988" height="72" rx="3" fill="#ffffff" stroke="#1f5f9e" stroke-width="1.5"/>
+      <text x="80" y="427" font-size="19">📝</text>
+      <text x="116" y="423" font-weight="600" fill="#131b26">Add my recommendation, then AI review on top</text>
+      <text x="116" y="446" font-size="14" fill="#41536b">Your change lands as fix(AC-003) first — then the reviewer runs against the amended diff.</text>
+      <text x="1020" y="432" font-size="12" fill="#1f5f9e" text-anchor="end" font-family="ui-monospace, Menlo, monospace">↩ BACK TO GATE</text>
+    </g>
+    <g>
+      <rect x="56" y="474" width="988" height="66" rx="3" fill="#ffffff" stroke="#d6dfeb"/>
+      <text x="80" y="505" font-size="19">♻️</text>
+      <text x="116" y="501" font-weight="600" fill="#131b26">Refactor now (while green)</text>
+      <text x="116" y="524" font-size="14" fill="#41536b">Clean up with the suite green, commit refactor(AC-003), re-run the tests.</text>
+      <text x="1020" y="510" font-size="12" fill="#1f5f9e" text-anchor="end" font-family="ui-monospace, Menlo, monospace">↩ BACK TO GATE</text>
+    </g>
+    <g>
+      <rect x="56" y="546" width="988" height="66" rx="3" fill="#ffffff" stroke="#d6dfeb"/>
+      <text x="80" y="577" font-size="19">⏭</text>
+      <text x="116" y="573" font-weight="600" fill="#131b26">Approve all remaining ACs</text>
+      <text x="116" y="596" font-size="14" fill="#41536b">Run the rest ungated. The whole-feature review still happens afterwards.</text>
+      <text x="1020" y="582" font-size="12" fill="#6d809a" text-anchor="end" font-family="ui-monospace, Menlo, monospace">EXIT</text>
+    </g>
+    <g>
+      <rect x="56" y="618" width="988" height="66" rx="3" fill="#ffffff" stroke="#d6dfeb"/>
+      <text x="80" y="649" font-size="19">❌</text>
+      <text x="116" y="645" font-weight="600" fill="#131b26">Reject — back to RED for this AC</text>
+      <text x="116" y="668" font-size="14" fill="#41536b">Wrong test → amend it. Wrong code → revert it. Wrong criterion → amend the spec.</text>
+      <text x="1020" y="654" font-size="12" fill="#9a3436" text-anchor="end" font-family="ui-monospace, Menlo, monospace">RESTART AC</text>
+    </g>
+  </g>
+</svg>

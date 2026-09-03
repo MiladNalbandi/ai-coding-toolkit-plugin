@@ -77,7 +77,7 @@ tests, and code never drift apart**. A year later, anyone reading the repo can a
 
 ## Step 0 — Ask the user which steps to run
 
-Before running any step, ask the user **two questions** and wait for answers.
+Before running any step, ask the user **three questions** and wait for answers.
 
 ### Question 1 — Which steps do you want to include?
 
@@ -133,6 +133,27 @@ Any tools the user wants to add (via "Other") get appended to `<active-tools>`.
 
 Store selected tools as `<active-tools>`. Step 6 runs only these in order.
 
+### Question 3 — How should steps 3 + 5 run, and how should I commit?
+
+Steps 3 (tests) and 5 (implement) run as the **per-AC loop** by default. Ask once, with
+`AskUserQuestion` (single-select), and store as `<loop-mode>`:
+
+```json
+{
+  "question": "How should I work through the acceptance criteria?",
+  "header": "Loop mode",
+  "multiSelect": false,
+  "options": [
+    { "label": "Per-AC loop (Recommended)", "description": "One AC at a time: red test → commit, minimum code → commit, review gate, next AC. Small diffs, small reviews, a bisectable history." },
+    { "label": "All ACs at once (legacy)", "description": "Write every failing test, implement everything, review once at the end. Only for a feature with 1–2 trivial ACs." }
+  ]
+}
+```
+
+If the user picks the per-AC loop, immediately ask the **commit-style** question defined
+in [`ac-loop.md` § 3](../coding-workflows/references/ac-loop.md) and store the answer as
+`<commit-style>` (default: two commits per AC).
+
 ---
 
 > The system should say what it means, test what it promises, and implement only what
@@ -148,14 +169,29 @@ the project is, then map the abstract roles below onto that stack — see
 ## The Loop
 
 ```
-1. Spec → 2. Contract → 3. Failing Tests → 4. Validation+Security
-   → 5. Implement → 6. Refactor → 7. Review+Smoke → 8. ADR (if any)
-   ↑__________ re-spec when a decision invalidates the original intent __________|
+1. Spec → 2. Contract → 4. Validation+Security
+       │
+       ▼
+   ┌ steps 3 + 5 run as ONE per-AC loop ──────────────────┐
+   │ for each AC:  red test → commit                      │
+   │               minimum code → commit                  │
+   │               review gate → next AC                  │
+   └──────────────────────────────────────────────────────┘
+       │
+       ▼
+   6. Refactor → 7. Review+Smoke → 8. ADR (if any)
+   ↑____ re-spec when a decision invalidates the intent ____|
 ```
 
 Steps 2 (contract) and 8 (ADR) are conditional. Everything else always happens, even
 for small changes. Trivial fixes may collapse the spec into a referenced bug/issue, but
 they still get a failing test first.
+
+**Steps 3 and 5 are not two passes over the feature.** They interleave, one acceptance
+criterion at a time, per `ai-coding-toolkit:coding-workflows` →
+[`references/ac-loop.md`](../coding-workflows/references/ac-loop.md). Step 3 below is
+*how to write a good test*; Step 5 is *how to implement*; the loop is the order they run
+in. Read `ac-loop.md` once per session before the first AC.
 
 Full step-by-step detail, including the validation and security checklists, lives in
 `references/workflow.md`. Read it before running the loop for the first time in a
@@ -210,10 +246,19 @@ gets explicit request/response schemas, at least one success and one error respo
 validation that matches the application's real rules. Lint it in CI. Non-HTTP changes
 skip this step but the spec must say so explicitly.
 
-### 3. Failing Tests — *red first*
+### 3. Failing Tests — *red first, one AC at a time*
+
+> **Run this step through the per-AC loop** —
+> [`ac-loop.md`](../coding-workflows/references/ac-loop.md). You write the test for
+> **one** AC, watch it go red, commit it, and go straight to Step 5 for that same AC.
+> You do not write all the tests up front unless `<loop-mode>` is "All ACs at once
+> (legacy)". Everything below is *how to write the test* — 3a–3k apply to every AC.
+
 Write tests against the spec and contract, not against code that does not yet exist.
-They must fail first. This is the first validation checkpoint: **if you cannot write a
-clear test, the spec is too vague.** Name tests after acceptance criteria where practical
+They must fail first — and for the **right reason**: the assertion, not an import error
+or a missing fixture. This is the first validation checkpoint: **if you cannot write a
+clear test, the AC is too vague** — take it back to the spec rather than guessing. Name
+tests after acceptance criteria where practical
 (e.g. `ac_003_creating_a_post_without_a_title_returns_422`). Security-sensitive behavior
 *must* have tests.
 
@@ -382,6 +427,12 @@ entry-point handler to "remember" rules.
 
 ### 5. Implement — *minimum code to make tests green*
 
+> **This is the GREEN phase of the per-AC loop** —
+> [`ac-loop.md`](../coding-workflows/references/ac-loop.md). You implement the code for
+> the AC whose test just went red in Step 3, commit it, run the gate, and only then move
+> to the next AC. The two modes below decide *how the code gets written*, not how much of
+> the feature is written at once.
+
 #### 5a. Ask: sequential or parallel?
 
 ```
@@ -398,12 +449,30 @@ Store as `<impl-mode>`.
 
 #### 5b-seq. Sequential implementation (if mode = 1)
 
-Default order: schema/migration → entity/model → test factory/fixture → authorization
-rule → use-case/action → input validator → output serializer → handler/endpoint → route.
-Stop when green. **YAGNI is load-bearing**: add no field, endpoint, abstraction, helper,
-permission, or behavior the spec did not ask for. Keep entry points thin.
+Work **one AC at a time**. Within an AC, follow the layer order: schema/migration →
+entity/model → test factory/fixture → authorization rule → use-case/action → input
+validator → output serializer → handler/endpoint → route — but only as far down that
+list as this AC's test actually needs.
+
+Stop when the AC's test is green **and** the full suite is still green. **YAGNI is
+load-bearing**: add no field, endpoint, abstraction, helper, permission, or behavior the
+AC did not ask for. Code that no current test drives belongs to a later AC. Keep entry
+points thin.
+
+Then: commit `feat(AC-NNN): …`, run the gate from `ac-loop.md` § 4, and return to Step 3
+for the next AC.
 
 #### 5b-par. Parallel agent implementation (if mode = 2)
+
+**The loop batches, it does not disappear.** Agents implement a batch of ACs whose files
+do not overlap; after the merge, the gate still runs **once per AC, in AC order**.
+Concurrency changes when code is written — never the number of gates or their order.
+
+```
+red tests for AC-003..AC-005  →  agents build in parallel  →  merge + full suite
+                                                                    │
+                            gate AC-003 → gate AC-004 → gate AC-005 ┘  (in order)
+```
 
 **Pre-flight: assign one file per agent — no two agents share a file.**
 
@@ -455,7 +524,8 @@ List all files each agent will write. If any file appears twice → serialize th
      ✘ 2 failures (agent C validator missing required field check — fix inline)
    ```
 4. **Fix inline** if any test fails — do not re-spawn agents for small fixes; fix in this context and re-run
-5. Proceed to Step 6 (Refactor) only when all tests are green
+5. Run the **per-AC gate for every AC in the batch, in AC order** (`ac-loop.md` § 4)
+6. Proceed to Step 6 (Refactor) only when all tests are green and every gate is answered
 
 ### 6. Refactor — *clean up while green*
 Run **only the tools the user selected in `<active-tools>` (Step 0, Question 2)** —
@@ -717,6 +787,9 @@ A change is mergeable only when:
 - Formatting, static analysis, the full test suite, and smoke tests all pass.
 - The PR has been reviewed; any non-obvious decision has an ADR.
 - No behavior outside the spec was added.
+- Every AC has its own commit pair (`test(AC-NNN)` + `feat(AC-NNN)`), or the equivalent
+  under the chosen `<commit-style>`, and every AC's gate was answered.
+- Every commit references its AC in the trailer (`Spec: docs/specs/NNN-….md#AC-NNN`).
 
 ---
 

@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="750" viewBox="0 0 1200 750" font-family="ui-sans-serif, system-ui, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <rect width="1200" height="750" fill="#101720"/>
+  <g opacity="0.13" stroke="#7fb2e8" stroke-width="1">
+    <path d="M0 90 H1200 M0 180 H1200 M0 270 H1200 M0 360 H1200 M0 450 H1200 M0 540 H1200"/>
+    <path d="M90 0 V630 M180 0 V630 M270 0 V630 M360 0 V630 M450 0 V630 M540 0 V630 M630 0 V630 M720 0 V630 M810 0 V630 M900 0 V630 M990 0 V630 M1080 0 V630"/>
+  </g>
+
+  <g transform="translate(0,62)">
+  <text x="80" y="120" font-size="15" fill="#7fb2e8" letter-spacing="3" font-family="ui-monospace, Menlo, monospace">AI CODING TOOLKIT · v1.8</text>
+  <text x="80" y="216" font-size="58" font-weight="600" fill="#e4ebf4">One acceptance criterion.</text>
+  <text x="80" y="284" font-size="58" font-weight="600" fill="#e4ebf4">Two commits. One gate.</text>
+  <text x="80" y="336" font-size="21" fill="#a7b6ca">Why I stopped letting the agent build the whole feature before I look at it.</text>
+
+  <g font-family="ui-monospace, Menlo, monospace" font-size="17">
+    <rect x="80" y="396" width="300" height="52" rx="3" fill="#1c1416" stroke="#a34a4c"/>
+    <text x="102" y="428" fill="#e79a9a">test(AC-003): …</text>
+    <text x="352" y="428" fill="#6b7d94">→</text>
+
+    <rect x="396" y="396" width="300" height="52" rx="3" fill="#12241d" stroke="#2f7d5f"/>
+    <text x="418" y="428" fill="#8fd3b1">feat(AC-003): …</text>
+    <text x="668" y="428" fill="#6b7d94">→</text>
+
+    <rect x="712" y="396" width="300" height="52" rx="3" fill="#132437" stroke="#3d6f9e"/>
+    <text x="734" y="428" fill="#9cc6ec">gate: what next?</text>
+  </g>
+
+  <g font-size="16" fill="#7b8ca3">
+    <text x="80" y="520">AC-001 ✔   AC-002 ✔   AC-003 ▶   AC-004 ⬜   AC-005 ⬜   AC-006 ⬜</text>
+    <text x="80" y="556">2/9 done · 41 tests green · 0 skipped</text>
+  </g>
+  </g>
+</svg>
