@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="700" viewBox="0 0 1200 700" font-family="ui-sans-serif, system-ui, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <rect width="1200" height="700" fill="#f4f7fb"/>
+  <defs>
+    <marker id="d" markerWidth="10" markerHeight="10" refX="5" refY="8" orient="auto"><path d="M0 0 L10 0 L5 10 z" fill="#8fa3bd"/></marker>
+  </defs>
+
+  <g fill="#131b26">
+    <text x="60" y="62" font-size="30" font-weight="600">Four places to put the same constraint</text>
+    <text x="60" y="92" font-size="17" fill="#41536b">Only the last one does not depend on the agent agreeing with you.</text>
+  </g>
+
+  <text x="46" y="140" font-size="11.5" fill="#8b95a4" letter-spacing="1.4">WEAKEST</text>
+  <path d="M60 152 V 596" stroke="#8fa3bd" stroke-width="2" marker-end="url(#d)"/>
+  <text x="42" y="628" font-size="11.5" fill="#8b95a4" letter-spacing="1.4">STRONGEST</text>
+
+  <line x1="806" y1="150" x2="806" y2="608" stroke="#d6dfeb" stroke-width="1"/>
+  <text x="826" y="142" font-size="12.5" font-weight="600" fill="#8b95a4" letter-spacing="1.4">WHAT GETS PAST IT</text>
+
+  <!-- 1 PROSE -->
+  <rect x="92" y="158" width="1048" height="98" rx="4" fill="#ffffff" stroke="#dcc4c3"/>
+  <rect x="92" y="158" width="6" height="98" rx="2" fill="#9a3436"/>
+  <text x="120" y="190" font-size="14" font-weight="600" fill="#9a3436" letter-spacing="1.4">1 · PROSE</text>
+  <text x="120" y="220" font-size="15.5" fill="#41536b" font-family="ui-monospace, Menlo, monospace">"don't read my .env"</text>
+  <text x="120" y="244" font-size="13.5" fill="#6d809a">a rule in the prompt or CLAUDE.md</text>
+  <text x="826" y="204" font-size="14.5" fill="#41536b">the goal, the moment the goal</text>
+  <text x="826" y="228" font-size="14.5" fill="#41536b">needs what the rule protects</text>
+
+  <!-- 2 INTENT -->
+  <rect x="92" y="272" width="1048" height="98" rx="4" fill="#ffffff" stroke="#e0cfae"/>
+  <rect x="92" y="272" width="6" height="98" rx="2" fill="#9a7433"/>
+  <text x="120" y="304" font-size="14" font-weight="600" fill="#9a7433" letter-spacing="1.4">2 · INTENT</text>
+  <text x="120" y="334" font-size="15.5" fill="#41536b" font-family="ui-monospace, Menlo, monospace">"…because those are live keys and I</text>
+  <text x="120" y="356" font-size="15.5" fill="#41536b" font-family="ui-monospace, Menlo, monospace">don't want them in a transcript"</text>
+  <text x="826" y="318" font-size="14.5" fill="#41536b">a path the agent doesn't recognise</text>
+  <text x="826" y="342" font-size="14.5" fill="#41536b">as the same thing — but far fewer</text>
+
+  <!-- 3 PERMISSION -->
+  <rect x="92" y="386" width="1048" height="98" rx="4" fill="#ffffff" stroke="#c3d1e3"/>
+  <rect x="92" y="386" width="6" height="98" rx="2" fill="#1f5f9e"/>
+  <text x="120" y="418" font-size="14" font-weight="600" fill="#1f5f9e" letter-spacing="1.4">3 · PERMISSION</text>
+  <text x="120" y="448" font-size="15.5" fill="#41536b" font-family="ui-monospace, Menlo, monospace">deny rules + a PreToolUse hook that</text>
+  <text x="120" y="470" font-size="15.5" fill="#41536b" font-family="ui-monospace, Menlo, monospace">matches the material, not the path</text>
+  <text x="826" y="432" font-size="14.5" fill="#41536b">a road you did not enumerate —</text>
+  <text x="826" y="456" font-size="14.5" fill="#41536b">deny rules are action-shaped too</text>
+
+  <!-- 4 ENVIRONMENT -->
+  <rect x="92" y="500" width="1048" height="98" rx="4" fill="#ffffff" stroke="#9fcbb4" stroke-width="1.5"/>
+  <rect x="92" y="500" width="6" height="98" rx="2" fill="#1f6b4f"/>
+  <text x="120" y="532" font-size="14" font-weight="600" fill="#1f6b4f" letter-spacing="1.4">4 · ENVIRONMENT</text>
+  <text x="120" y="562" font-size="15.5" fill="#41536b" font-family="ui-monospace, Menlo, monospace">the box the agent runs in holds dev</text>
+  <text x="120" y="584" font-size="15.5" fill="#41536b" font-family="ui-monospace, Menlo, monospace">credentials — the real ones aren't there</text>
+  <text x="826" y="546" font-size="14.5" font-weight="600" fill="#1f6b4f">nothing — there is no wish</text>
+  <text x="826" y="570" font-size="14.5" fill="#41536b">left to grant</text>
+
+  <text x="60" y="664" font-size="16.5" fill="#41536b">Layers 1–3 are advice, guardrails and locks. Layer 4 is the only one that survives an agent smarter than your threat model.</text>
+</svg>

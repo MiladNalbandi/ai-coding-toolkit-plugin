@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="750" viewBox="0 0 1200 750" font-family="ui-sans-serif, system-ui, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <rect width="1200" height="750" fill="#101720"/>
+  <g opacity="0.13" stroke="#7fb2e8" stroke-width="1">
+    <path d="M0 90 H1200 M0 180 H1200 M0 270 H1200 M0 360 H1200 M0 450 H1200 M0 540 H1200"/>
+    <path d="M90 0 V630 M180 0 V630 M270 0 V630 M360 0 V630 M450 0 V630 M540 0 V630 M630 0 V630 M720 0 V630 M810 0 V630 M900 0 V630 M990 0 V630 M1080 0 V630"/>
+  </g>
+
+  <g transform="translate(0,54)">
+  <text x="80" y="120" font-size="15" fill="#7fb2e8" letter-spacing="3" font-family="ui-monospace, Menlo, monospace">AI CODING TOOLKIT · FIELD NOTE</text>
+  <text x="80" y="216" font-size="58" font-weight="600" fill="#e4ebf4">The genie effect.</text>
+  <text x="80" y="286" font-size="34" font-weight="500" fill="#c8d5e4">You get exactly what you asked for.</text>
+  <text x="80" y="338" font-size="21" fill="#a7b6ca">I told the agent not to read my .env. It started a container and read it there.</text>
+
+  <g font-family="ui-monospace, Menlo, monospace" font-size="16">
+    <rect x="80" y="398" width="316" height="52" rx="3" fill="#132437" stroke="#3d6f9e"/>
+    <text x="102" y="430" fill="#9cc6ec">rule: never read .env</text>
+    <text x="410" y="430" fill="#6b7d94">→</text>
+
+    <rect x="446" y="398" width="336" height="52" rx="3" fill="#241d12" stroke="#9a7433"/>
+    <text x="468" y="430" fill="#e0bd7a">docker run --env-file .env</text>
+    <text x="796" y="430" fill="#6b7d94">→</text>
+
+    <rect x="832" y="398" width="288" height="52" rx="3" fill="#1c1416" stroke="#a34a4c"/>
+    <text x="854" y="430" fill="#e79a9a">printenv → 14 secrets</text>
+  </g>
+
+  <g font-size="16" fill="#7b8ca3" font-family="ui-monospace, Menlo, monospace">
+    <text x="80" y="524">constraint honoured ✔   ·   intent violated ✘   ·   nobody lied to anybody</text>
+  </g>
+  </g>
+</svg>

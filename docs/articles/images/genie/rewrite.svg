@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="690" viewBox="0 0 1200 690" font-family="ui-sans-serif, system-ui, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <rect width="1200" height="690" fill="#f4f7fb"/>
+  <defs>
+    <marker id="r" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0 0 L9 4.5 L0 9 z" fill="#1f5f9e"/></marker>
+  </defs>
+
+  <g fill="#131b26">
+    <text x="60" y="62" font-size="30" font-weight="600">Write the property, not the prohibition</text>
+    <text x="60" y="92" font-size="17" fill="#41536b">A ban is checked against one action. A property is checked against the outcome, whatever road produced it.</text>
+  </g>
+
+  <text x="76" y="146" font-size="13" font-weight="600" fill="#9a3436" letter-spacing="1.4">WHAT WE TEND TO WRITE</text>
+  <text x="76" y="166" font-size="13" fill="#8b95a4">an action ban — covers one path</text>
+  <text x="556" y="146" font-size="13" font-weight="600" fill="#1f6b4f" letter-spacing="1.4">WHAT SURVIVES A CLEVER AGENT</text>
+  <text x="556" y="166" font-size="13" fill="#8b95a4">an outcome property — covers the result</text>
+
+  <!-- row 1 -->
+  <rect x="60" y="184" width="416" height="88" rx="4" fill="#ffffff" stroke="#dcc4c3"/>
+  <text x="80" y="222" font-size="15" fill="#41536b" font-family="ui-monospace, Menlo, monospace">"don't read my .env"</text>
+  <text x="80" y="250" font-size="13" fill="#9a3436">→ container, subagent, script: all still open</text>
+  <path d="M486 228 L534 228" stroke="#1f5f9e" stroke-width="2" marker-end="url(#r)"/>
+  <rect x="544" y="184" width="596" height="88" rx="4" fill="#ffffff" stroke="#bcd8c9"/>
+  <g font-size="15" fill="#41536b">
+    <text x="564" y="216">No live credential value may enter your context, your commands,</text>
+    <text x="564" y="240">your logs or a file you write — by any tool, container, subagent</text>
+    <text x="564" y="262">or script. Need one to continue? Stop and ask.</text>
+  </g>
+
+  <!-- row 2 -->
+  <rect x="60" y="292" width="416" height="88" rx="4" fill="#ffffff" stroke="#dcc4c3"/>
+  <text x="80" y="330" font-size="15" fill="#41536b" font-family="ui-monospace, Menlo, monospace">"don't run migrations on prod"</text>
+  <text x="80" y="358" font-size="13" fill="#9a3436">→ a seed script is not a migration</text>
+  <path d="M486 336 L534 336" stroke="#1f5f9e" stroke-width="2" marker-end="url(#r)"/>
+  <rect x="544" y="292" width="596" height="88" rx="4" fill="#ffffff" stroke="#bcd8c9"/>
+  <g font-size="15" fill="#41536b">
+    <text x="564" y="326">No statement I have not read reaches a database that holds</text>
+    <text x="564" y="350">real rows — migration, script, ORM call or psql session.</text>
+  </g>
+
+  <!-- row 3 -->
+  <rect x="60" y="400" width="416" height="88" rx="4" fill="#ffffff" stroke="#dcc4c3"/>
+  <text x="80" y="438" font-size="15" fill="#41536b" font-family="ui-monospace, Menlo, monospace">"don't push to main"</text>
+  <text x="80" y="466" font-size="13" fill="#9a3436">→ a PR that auto-merges is not a push</text>
+  <path d="M486 444 L534 444" stroke="#1f5f9e" stroke-width="2" marker-end="url(#r)"/>
+  <rect x="544" y="400" width="596" height="88" rx="4" fill="#ffffff" stroke="#bcd8c9"/>
+  <g font-size="15" fill="#41536b">
+    <text x="564" y="434">Nothing I have not reviewed becomes a commit that someone</text>
+    <text x="564" y="458">else can pull.</text>
+  </g>
+
+  <!-- footer band -->
+  <rect x="60" y="518" width="1080" height="116" rx="4" fill="#eef3fa" stroke="#c3d1e3"/>
+  <text x="84" y="550" font-size="13" font-weight="600" fill="#1f5f9e" letter-spacing="1.4">AND ALWAYS LEAVE A LEGAL MOVE</text>
+  <text x="84" y="582" font-size="15.5" fill="#41536b">.env.example with dummy values  ·  a stub credential  ·  "if you need the real thing, stop and ask me"</text>
+  <text x="84" y="610" font-size="15.5" fill="#41536b">A constraint with no way through is not a constraint. It is pressure on the constraint.</text>
+</svg>

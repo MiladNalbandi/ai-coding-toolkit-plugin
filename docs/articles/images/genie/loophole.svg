@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="660" viewBox="0 0 1200 660" font-family="ui-sans-serif, system-ui, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <rect width="1200" height="660" fill="#f4f7fb"/>
+  <defs>
+    <marker id="g" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0 0 L9 4.5 L0 9 z" fill="#8fa3bd"/></marker>
+    <marker id="w" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0 0 L9 4.5 L0 9 z" fill="#9a7433"/></marker>
+  </defs>
+
+  <g fill="#131b26">
+    <text x="60" y="62" font-size="30" font-weight="600">One ban, one road</text>
+    <text x="60" y="92" font-size="17" fill="#41536b">A prohibition names a single path. The goal keeps pointing at everything the prohibition did not name.</text>
+  </g>
+
+  <!-- GOAL -->
+  <rect x="60" y="288" width="238" height="116" rx="4" fill="#ffffff" stroke="#1f5f9e" stroke-width="1.5"/>
+  <rect x="60" y="288" width="238" height="32" rx="4" fill="#dbe8f7"/>
+  <rect x="60" y="312" width="238" height="8" fill="#dbe8f7"/>
+  <text x="78" y="310" font-size="13" font-weight="600" fill="#1f5f9e" letter-spacing="1.4">THE GOAL</text>
+  <g font-size="14.5" fill="#41536b">
+    <text x="78" y="348">check that the server</text>
+    <text x="78" y="370">accepts the auth header</text>
+    <text x="78" y="392" font-size="13" fill="#6d809a">— needs a real key</text>
+  </g>
+
+  <!-- lane 1: blocked -->
+  <path d="M298 346 C 322 346, 322 200, 348 200 H 584" stroke="#9a3436" stroke-width="2" fill="none" stroke-dasharray="6 5"/>
+  <text x="356" y="188" font-size="13.5" fill="#9a3436" font-family="ui-monospace, Menlo, Consolas, monospace">Read("./.env")</text>
+  <text x="356" y="236" font-size="13" fill="#8b95a4">the one road you named</text>
+  <g stroke="#9a3436" stroke-width="2.5"><path d="M596 190 L614 210 M614 190 L596 210"/></g>
+
+  <!-- the wall: only as wide as the ban -->
+  <rect x="628" y="164" width="16" height="72" fill="#e9c9c8" stroke="#9a3436"/>
+  <text x="656" y="184" font-size="12.5" font-weight="600" fill="#9a3436" letter-spacing="1.2">RULE</text>
+  <text x="656" y="204" font-size="13.5" fill="#7a4442" font-family="ui-monospace, Menlo, monospace">"don't read my .env"</text>
+  <text x="656" y="226" font-size="12.5" fill="#8b95a4">covers this lane, and only this lane</text>
+
+  <!-- lane 2 -->
+  <path d="M298 346 C 322 346, 322 278, 348 278 H 886" stroke="#8fa3bd" stroke-width="2" fill="none" marker-end="url(#g)"/>
+  <text x="356" y="266" font-size="13.5" fill="#41536b" font-family="ui-monospace, Menlo, monospace">Bash: cat .env | grep KEY</text>
+
+  <!-- lane 3: what actually happened -->
+  <path d="M298 346 H 886" stroke="#9a7433" stroke-width="3" fill="none" marker-end="url(#w)"/>
+  <rect x="348" y="322" width="372" height="26" rx="3" fill="#faf1de" stroke="#d8bb84"/>
+  <text x="360" y="341" font-size="13.5" fill="#7a5c22" font-family="ui-monospace, Menlo, monospace">docker run --env-file .env … &amp;&amp; printenv</text>
+  <text x="730" y="376" font-size="13.5" font-weight="600" fill="#9a7433">← what it actually did</text>
+
+  <!-- lane 4 -->
+  <path d="M298 346 C 322 346, 322 414, 348 414 H 886" stroke="#8fa3bd" stroke-width="2" fill="none" marker-end="url(#g)"/>
+  <text x="356" y="404" font-size="13.5" fill="#41536b" font-family="ui-monospace, Menlo, monospace">subagent: "fetch the DB config"</text>
+
+  <!-- lane 5 -->
+  <path d="M298 346 C 322 346, 322 482, 348 482 H 886" stroke="#8fa3bd" stroke-width="2" fill="none" marker-end="url(#g)"/>
+  <text x="356" y="472" font-size="13.5" fill="#41536b" font-family="ui-monospace, Menlo, monospace">node -e "require('dotenv').config()"</text>
+
+  <!-- lane 6 hint -->
+  <path d="M298 346 C 322 346, 322 534, 348 534 H 560" stroke="#c3d1e3" stroke-width="2" fill="none" stroke-dasharray="4 6"/>
+  <text x="356" y="524" font-size="13.5" fill="#8b95a4">…and the one neither of us has thought of yet</text>
+
+  <!-- SECRET -->
+  <rect x="900" y="288" width="240" height="116" rx="4" fill="#ffffff" stroke="#9a3436" stroke-width="1.5"/>
+  <rect x="900" y="288" width="240" height="32" rx="4" fill="#f7dedd"/>
+  <rect x="900" y="312" width="240" height="8" fill="#f7dedd"/>
+  <text x="918" y="310" font-size="13" font-weight="600" fill="#9a3436" letter-spacing="1.4">WHAT YOU MEANT</text>
+  <g font-size="14.5" fill="#41536b">
+    <text x="918" y="348">the live keys never</text>
+    <text x="918" y="370">enter the transcript</text>
+    <text x="918" y="392" font-size="13" fill="#6d809a">— never actually stated</text>
+  </g>
+
+  <text x="60" y="600" font-size="16.5" fill="#41536b">A ban is a filter on one action. A goal is a search over every action. Given a wide enough toolbelt, the search wins.</text>
+</svg>
